@@ -25,7 +25,7 @@ const VIDEO_CONSTRAINS =
 
 export default class RoomClient
 {
-	constructor({ dispatch, peerName, roomId })
+	constructor({ peerName, roomId, dispatch })
 	{
 		logger.debug(
 			'constructor() [peerName:"%s", roomId:"%s"]', peerName, roomId);
@@ -85,8 +85,9 @@ export default class RoomClient
 		// Leave the mediasoup Room.
 		this._room.leave();
 
-		// Close protoo Peer.
-		this._protoo.close();
+		// Close protoo Peer (wait a bit so mediasoup-client can send
+		// the 'leaveRoom' notification).
+		setTimeout(() => this._protoo.close(), 250);
 
 		this._dispatch(actionCreators.setRoomState('closed'));
 	}
@@ -134,8 +135,6 @@ export default class RoomClient
 	{
 		logger.debug('addWebcam()');
 
-		this._dispatch(actionCreators.setWebcamInProgress(true));
-
 		return Promise.resolve()
 			.then(() =>
 			{
@@ -145,14 +144,8 @@ export default class RoomClient
 			{
 				return this._setWebcamProducer();
 			})
-			.then(() =>
-			{
-				this._dispatch(actionCreators.setWebcamInProgress(false));
-			})
 			.catch((error) =>
 			{
-				this._dispatch(actionCreators.setWebcamInProgress(false));
-
 				logger.error('addWebcam() | failed: %o', error);
 			});
 	}
@@ -287,7 +280,7 @@ export default class RoomClient
 			logger.warn('protoo Peer "disconnected" event');
 
 			// Leave Room.
-			try { this._room.leave({ cause: 'protoo disconnected' }); }
+			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
 			catch (error) {}
 
 			this._dispatch(actionCreators.setRoomState('disconnected'));
@@ -386,9 +379,10 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
+				// TODO: Uncomment
 				// Add our webcam.
-				if (this._room.canSend('video'))
-					this.addWebcam();
+				// if (this._room.canSend('video'))
+				// 	this.addWebcam();
 			})
 			.then(() =>
 			{

@@ -52,6 +52,12 @@ const LocalView = (props) =>
 				/>
 			</div>
 
+			<div className='info'>
+				<p className='name'>
+					{me.name}
+				</p>
+			</div>
+
 			<Video
 				track={webcamProducer ? webcamProducer.track : null}
 				visible={videoVisible}

@@ -1,14 +1,8 @@
+import * as actionCreators from './actionCreators';
 import RoomClient from '../RoomClient';
 
-// eslint-disable-next-line no-unused-vars
-export default ({ getState, dispatch }) => (next) =>
+export default ({ dispatch }) => (next) =>
 {
-	// TODO: Useful?
-	// function isRoomClosed()
-	// {
-	// 	return getState().room.state === 'closed';
-	// }
-
 	let client;
 
 	return (action) =>
@@ -19,7 +13,7 @@ export default ({ getState, dispatch }) => (next) =>
 			{
 				const { peerName, roomId } = action.payload;
 
-				client = new RoomClient({ dispatch, peerName, roomId });
+				client = new RoomClient({ peerName, roomId, dispatch });
 
 				// TODO: TMP
 				global.CLIENT = client;
@@ -50,14 +44,18 @@ export default ({ getState, dispatch }) => (next) =>
 
 			case 'REMOVE_WEBCAM':
 			{
-				client.removeWebcam();
+				dispatch(actionCreators.setWebcamInProgress(true));
+				client.removeWebcam()
+					.then(() => dispatch(actionCreators.setWebcamInProgress(false)));
 
 				break;
 			}
 
 			case 'ADD_WEBCAM':
 			{
-				client.addWebcam();
+				dispatch(actionCreators.setWebcamInProgress(true));
+				client.addWebcam()
+					.then(() => dispatch(actionCreators.setWebcamInProgress(false)));
 
 				break;
 			}
