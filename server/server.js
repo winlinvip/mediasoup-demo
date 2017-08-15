@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-'use strict';
-
 process.title = 'mediasoup-demo-server';
 
 const config = require('./config');
 
 process.env.DEBUG = config.debug || '*LOG* *WARN* *ERROR*';
 
+/* eslint-disable no-console */
 console.log('- process.env.DEBUG:', process.env.DEBUG);
 console.log('- config.mediasoup.logLevel:', config.mediasoup.logLevel);
 console.log('- config.mediasoup.logTags:', config.mediasoup.logTags);
+/* eslint-enable no-console */
 
 const fs = require('fs');
 const https = require('https');
@@ -24,10 +24,10 @@ const logger = require('./lib/logger')();
 const Room = require('./lib/Room');
 
 // Map of Room instances indexed by roomId.
-let rooms = new Map();
+const rooms = new Map();
 
 // mediasoup server.
-let mediaServer = mediasoup.Server(
+const mediaServer = mediasoup.Server(
 	{
 		numWorkers       : 1,
 		logLevel         : config.mediasoup.logLevel,
@@ -47,16 +47,17 @@ mediaServer.on('newroom', (room) =>
 });
 
 // HTTPS server for the protoo WebSocjet server.
-let tls =
+const tls =
 {
 	cert : fs.readFileSync(config.tls.cert),
 	key  : fs.readFileSync(config.tls.key)
 };
-let httpsServer = https.createServer(tls, (req, res) =>
-	{
-		res.writeHead(404, 'Not Here');
-		res.end();
-	});
+
+const httpsServer = https.createServer(tls, (req, res) =>
+{
+	res.writeHead(404, 'Not Here');
+	res.end();
+});
 
 httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
 {
@@ -64,7 +65,7 @@ httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
 });
 
 // Protoo WebSocket server.
-let webSocketServer = new protooServer.WebSocketServer(httpsServer,
+const webSocketServer = new protooServer.WebSocketServer(httpsServer,
 	{
 		maxReceivedFrameSize     : 960000, // 960 KBytes.
 		maxReceivedMessageSize   : 960000,
@@ -76,15 +77,16 @@ let webSocketServer = new protooServer.WebSocketServer(httpsServer,
 webSocketServer.on('connectionrequest', (info, accept, reject) =>
 {
 	// The client indicates the roomId and peerId in the URL query.
-	let u = url.parse(info.request.url, true);
-	let roomId = u.query['room-id'];
-	let peerId = u.query['peer-id'];
+	const u = url.parse(info.request.url, true);
+	const roomId = u.query['room-id'];
+	const peerId = u.query['peer-id'];
 
 	if (!roomId || !peerId)
 	{
 		logger.warn('connection request without roomId and/or peerId');
 
 		reject(400, 'Connection request without roomId and/or peerId');
+
 		return;
 	}
 
@@ -95,8 +97,8 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 	{
 		logger.debug('creating a new Room [roomId:"%s"]', roomId);
 
-		let room = new Room(roomId, mediaServer);
-		let logStatusTimer = setInterval(() =>
+		const room = new Room(roomId, mediaServer);
+		const logStatusTimer = setInterval(() =>
 		{
 			room.logStatus();
 		}, 10000);
@@ -110,8 +112,8 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		});
 	}
 
-	let room = rooms.get(roomId);
-	let transport = accept();
+	const room = rooms.get(roomId);
+	const transport = accept();
 
 	room.createProtooPeer(peerId, transport)
 		.catch((error) =>
@@ -133,10 +135,10 @@ function openCommandConsole()
 	closeTerminal();
 
 	cmd = readline.createInterface(
-	{
-		input  : process.stdin,
-		output : process.stdout
-	});
+		{
+			input  : process.stdin,
+			output : process.stdout
+		});
 
 	cmd.on('SIGINT', () =>
 	{
@@ -243,7 +245,8 @@ function openTerminal()
 	closeCommandConsole();
 	closeTerminal();
 
-	terminal = repl.start({
+	terminal = repl.start(
+		{
 			prompt          : 'terminal> ',
 			useColors       : true,
 			useGlobal       : true,
@@ -288,10 +291,12 @@ Object.defineProperty(global, 'c',
 
 function stdinLog(msg)
 {
+	// eslint-disable-next-line no-console
 	console.log(colors.green(msg));
 }
 
 function stdinError(msg)
 {
+	// eslint-disable-next-line no-console
 	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
 }

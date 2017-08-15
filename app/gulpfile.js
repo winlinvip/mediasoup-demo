@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Tasks:
  *
@@ -23,7 +21,6 @@ const gulp = require('gulp');
 const gulpif = require('gulp-if');
 const gutil = require('gulp-util');
 const plumber = require('gulp-plumber');
-const touch = require('gulp-touch');
 const rename = require('gulp-rename');
 const header = require('gulp-header');
 const browserify = require('browserify');
@@ -55,19 +52,18 @@ process.env.NODE_ENV = 'development';
 
 function logError(error)
 {
-	gutil.log(gutil.colors.red(String(error)));
-
-	throw error;
+	gutil.log(gutil.colors.red(error.stack));
 }
 
 function bundle(options)
 {
 	options = options || {};
 
-	let watch = !!options.watch;
+	const watch = Boolean(options.watch);
+
 	let bundler = browserify(
 		{
-			entries      : path.join(__dirname, PKG.main),
+			entries      : PKG.main,
 			extensions   : [ '.js', '.jsx' ],
 			// required for sourcemaps (must be false otherwise).
 			debug        : process.env.NODE_ENV === 'development',
@@ -81,7 +77,12 @@ function bundle(options)
 		.transform('babelify',
 			{
 				presets : [ 'es2015', 'react' ],
-				plugins : [ 'transform-runtime', 'transform-object-assign' ]
+				plugins :
+				[
+					'transform-runtime',
+					'transform-object-assign',
+					'transform-object-rest-spread'
+				]
 			})
 		.transform(envify(
 			{
@@ -95,7 +96,7 @@ function bundle(options)
 
 		bundler.on('update', () =>
 		{
-			let start = Date.now();
+			const start = Date.now();
 
 			gutil.log('bundling...');
 			rebundle();
@@ -107,6 +108,7 @@ function bundle(options)
 	{
 		return bundler.bundle()
 			.on('error', logError)
+			.pipe(plumber())
 			.pipe(source(`${PKG.name}.js`))
 			.pipe(buffer())
 			.pipe(rename(`${PKG.name}.js`))
@@ -140,7 +142,12 @@ gulp.task('env:prod', (done) =>
 
 gulp.task('lint', () =>
 {
-	let src = [ 'gulpfile.js', 'lib/**/*.js', 'lib/**/*.jsx' ];
+	const src =
+	[
+		'gulpfile.js',
+		'lib/**/*.js',
+		'lib/**/*.jsx'
+	];
 
 	return gulp.src(src)
 		.pipe(plumber())
@@ -164,8 +171,7 @@ gulp.task('css', () =>
 				maxWeightResource : 50000 // So big ttf fonts are not included, nice.
 			}))
 		.pipe(rename(`${PKG.name}.css`))
-		.pipe(gulp.dest(OUTPUT_DIR))
-		.pipe(touch());
+		.pipe(gulp.dest(OUTPUT_DIR));
 });
 
 gulp.task('html', () =>
@@ -176,7 +182,7 @@ gulp.task('html', () =>
 
 gulp.task('resources', (done) =>
 {
-	let dst = path.join(OUTPUT_DIR, 'resources');
+	const dst = path.join(OUTPUT_DIR, 'resources');
 
 	mkdirp.sync(dst);
 	ncp('resources', dst, { stopOnErr: true }, (error) =>
@@ -198,15 +204,20 @@ gulp.task('bundle:watch', () =>
 	return bundle({ watch: true });
 });
 
+gulp.task('test:bundle:watch', () =>
+{
+	return bundle({ watch: true, entries: 'test/index.jsx' });
+});
+
 gulp.task('livebrowser', (done) =>
 {
 	const config = require('../server/config');
 
 	browserSync(
 		{
-			open      : 'external',
-			host      : config.domain,
-			server    :
+			open   : 'external',
+			host   : config.domain,
+			server :
 			{
 				baseDir : OUTPUT_DIR
 			},
@@ -224,9 +235,9 @@ gulp.task('browser', (done) =>
 
 	browserSync(
 		{
-			open      : 'external',
-			host      : config.domain,
-			server    :
+			open   : 'external',
+			host   : config.domain,
+			server :
 			{
 				baseDir : OUTPUT_DIR
 			},

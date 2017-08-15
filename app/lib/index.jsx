@@ -1,41 +1,51 @@
-'use strict';
-
-import browser from 'bowser';
 import domready from 'domready';
 import UrlParse from 'url-parse';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import {
+	applyMiddleware as applyFluxMiddleware,
+	createStore as createFluxStore
+} from 'redux';
+import { createLogger as createReduxLogger } from 'redux-logger';
+import { getDeviceInfo } from 'mediasoup-client';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import randomString from 'random-string';
 import Logger from './Logger';
 import * as utils from './utils';
-import edgeRTCPeerConnection from './edge/RTCPeerConnection';
-import edgeRTCSessionDescription from './edge/RTCSessionDescription';
-import App from './components/App';
-
-const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#room-id=([0-9a-zA-Z_-]+)$');
-const logger = new Logger();
+import * as actionCreators from './flux/actionCreators';
+import reducers from './flux/reducers';
+import roomClientMiddleware from './flux/roomClientMiddleware';
+import Room from './components/Room';
 
 injectTapEventPlugin();
 
-logger.debug('detected browser [name:"%s", version:%s]', browser.name, browser.version);
+const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#roomId=([0-9a-zA-Z_-]+)$');
 
-// If Edge, use the Jitsi RTCPeerConnection shim.
-if (browser.msedge)
-{
-	logger.debug('Edge detected, overriding RTCPeerConnection and RTCSessionDescription');
+const logger = new Logger();
 
-	window.RTCPeerConnection = edgeRTCPeerConnection;
-	window.RTCSessionDescription = edgeRTCSessionDescription;
-}
-// Otherwise, do almost anything.
-else
+const reduxMiddlewares = [];
+
+if (process.env.NODE_ENV === 'development')
 {
-	window.RTCPeerConnection =
-		window.webkitRTCPeerConnection ||
-		window.mozRTCPeerConnection ||
-		window.RTCPeerConnection;
+	const fluxLogger = createReduxLogger(
+		{
+			duration  : true,
+			timestamp : false,
+			level     : 'log',
+			logErrors : true
+		});
+
+	reduxMiddlewares.push(fluxLogger);
 }
+
+reduxMiddlewares.push(roomClientMiddleware);
+
+const store = createFluxStore(
+	reducers,
+	undefined,
+	applyFluxMiddleware(...reduxMiddlewares)
+);
 
 domready(() =>
 {
@@ -43,21 +53,16 @@ domready(() =>
 
 	// Load stuff and run
 	utils.initialize()
-		.then(run)
-		.catch((error) =>
-		{
-			console.error(error);
-		});
+		.then(run);
 });
 
 function run()
 {
 	logger.debug('run() [environment:%s]', process.env.NODE_ENV);
 
-	let container = document.getElementById('mediasoup-demo-app-container');
-	let urlParser = new UrlParse(window.location.href, true);
-	let match = urlParser.hash.match(REGEXP_FRAGMENT_ROOM_ID);
-	let peerId = randomString({ length: 8 }).toLowerCase();
+	const peerName = randomString({ length: 8 }).toLowerCase();
+	const urlParser = new UrlParse(window.location.href, true);
+	const match = urlParser.hash.match(REGEXP_FRAGMENT_ROOM_ID);
 	let roomId;
 
 	if (match)
@@ -67,8 +72,33 @@ function run()
 	else
 	{
 		roomId = randomString({ length: 8 }).toLowerCase();
-		window.location = `#room-id=${roomId}`;
+		window.location = `#roomId=${roomId}`;
 	}
 
-	ReactDOM.render(<App peerId={peerId} roomId={roomId}/>, container);
+	render(
+		<Provider store={store}>
+			<Room />
+		</Provider>,
+		document.getElementById('mediasoup-demo-app-container')
+	);
+
+	const device = `${getDeviceInfo().name} ${getDeviceInfo().version}`;
+
+	store.dispatch(
+		actionCreators.joinRoom(peerName, roomId, device));
 }
+
+// TODO: TMP
+global.STORE = store;
+global.ACTION_CREATORS = actionCreators;
+
+// setTimeout(() =>
+// {
+// 	global.STORE.dispatch(global.ACTION_CREATORS.joinRoom('alice', 'abcd1234'));
+// }, 500);
+
+// setTimeout(() =>
+// {
+// 	global.STORE.dispatch(global.ACTION_CREATORS.leaveRoom());
+// }, 1000);
+

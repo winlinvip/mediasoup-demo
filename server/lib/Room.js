@@ -1,5 +1,3 @@
-'use strict';
-
 const EventEmitter = require('events').EventEmitter;
 const protooServer = require('protoo-server');
 const webrtc = require('mediasoup').webrtc;
@@ -62,7 +60,7 @@ class Room extends EventEmitter
 					{
 						logger.debug('room "audiolevels" event');
 
-						for (let entry of entries)
+						for (const entry of entries)
 						{
 							logger.debug('- [peer name:%s, rtpReceiver.id:%s, audio level:%s]',
 								entry.peer.name, entry.rtpReceiver.id, entry.audioLevel);
@@ -89,7 +87,7 @@ class Room extends EventEmitter
 
 						if (this._activeSpeaker !== activeSpeaker)
 						{
-							let data = {};
+							const data = {};
 
 							if (activeSpeaker)
 							{
@@ -114,7 +112,7 @@ class Room extends EventEmitter
 				});
 
 				// Run all the pending join requests.
-				for (let protooPeer of this._pendingProtooPeers)
+				for (const protooPeer of this._pendingProtooPeers)
 				{
 					this._handleProtooPeer(protooPeer);
 				}
@@ -159,9 +157,12 @@ class Room extends EventEmitter
 
 		if (this._protooRoom.hasPeer(peerId))
 		{
-			logger.warn('createProtooPeer() | there is already a peer with same peerId, closing the previous one [peerId:"%s"]', peerId);
+			logger.warn(
+				'createProtooPeer() | there is already a peer with same peerId, ' +
+				'closing the previous one [peerId:"%s"]',
+				peerId);
 
-			let protooPeer = this._protooRoom.getPeer(peerId);
+			const protooPeer = this._protooRoom.getPeer(peerId);
 
 			protooPeer.close();
 		}
@@ -180,7 +181,7 @@ class Room extends EventEmitter
 	{
 		logger.debug('_handleProtooPeer() [peerId:"%s"]', protooPeer.id);
 
-		let mediaPeer = this._mediaRoom.Peer(protooPeer.id);
+		const mediaPeer = this._mediaRoom.Peer(protooPeer.id);
 		let peerconnection;
 
 		protooPeer.data.msids = [];
@@ -240,7 +241,7 @@ class Room extends EventEmitter
 				peerconnection = new webrtc.RTCPeerConnection(
 					{
 						peer             : mediaPeer,
-						usePlanB         : !!data.usePlanB,
+						usePlanB         : Boolean(data.usePlanB),
 						transportOptions : config.mediasoup.peerTransport,
 						maxBitrate       : this._maxBitrate
 					});
@@ -250,10 +251,12 @@ class Room extends EventEmitter
 
 				mediaPeer.on('newtransport', (transport) =>
 				{
-					transport.on('iceselectedtuplechange', (data) =>
+					transport.on('iceselectedtuplechange', (data2) =>
 					{
-						logger.log('"iceselectedtuplechange" event [peerId:"%s", protocol:%s, remoteIP:%s, remotePort:%s]',
-							protooPeer.id, data.protocol, data.remoteIP, data.remotePort);
+						logger.log(
+							'"iceselectedtuplechange" event ' +
+							'[peerId:"%s", protocol:%s, remoteIP:%s, remotePort:%s]',
+							protooPeer.id, data2.protocol, data2.remoteIP, data2.remotePort);
 					});
 				});
 
@@ -317,7 +320,8 @@ class Room extends EventEmitter
 
 				peerconnection.on('signalingstatechange', () =>
 				{
-					logger.debug('"signalingstatechange" event [peerId:"%s", signalingState:%s]',
+					logger.debug(
+						'"signalingstatechange" event [peerId:"%s", signalingState:%s]',
 						protooPeer.id, peerconnection.signalingState);
 				});
 			})
@@ -327,7 +331,7 @@ class Room extends EventEmitter
 				{
 					logger.debug('protoo Peer "request" event [method:%s]', request.method);
 
-					switch(request.method)
+					switch (request.method)
 					{
 						case 'reofferme':
 						{
@@ -347,7 +351,7 @@ class Room extends EventEmitter
 								.catch((error) =>
 								{
 									logger.error('"restartice" request failed: %s', error);
-									logger.error('stack:\n' + error.stack);
+									logger.error(`stack:\n${error.stack}`);
 
 									reject(500, `"restartice" failed: ${error.message}`);
 								});
@@ -357,16 +361,16 @@ class Room extends EventEmitter
 
 						case 'disableremotevideo':
 						{
-							let videoMsid = request.data.msid;
-							let disable = request.data.disable;
+							const videoMsid = request.data.msid;
+							const disable = request.data.disable;
 							let videoRtpSender;
 
-							for (let rtpSender of mediaPeer.rtpSenders)
+							for (const rtpSender of mediaPeer.rtpSenders)
 							{
 								if (rtpSender.kind !== 'video')
 									continue;
 
-								let msid = rtpSender.rtpParameters.userParameters.msid.split(/\s/)[0];
+								const msid = rtpSender.rtpParameters.userParameters.msid.split(/\s/)[0];
 
 								if (msid === videoMsid)
 								{
@@ -387,15 +391,16 @@ class Room extends EventEmitter
 									})
 									.then(() =>
 									{
-										logger.log('"disableremotevideo" request succeed [disable:%s]',
-											!!disable);
+										logger.log(
+											'"disableremotevideo" request succeed [disable:%s]',
+											Boolean(disable));
 
 										accept();
 									})
 									.catch((error) =>
 									{
 										logger.error('"disableremotevideo" request failed: %s', error);
-										logger.error('stack:\n' + error.stack);
+										logger.error(`stack:\n${error.stack}`);
 
 										reject(500, `"disableremotevideo" failed: ${error.message}`);
 									});
@@ -420,7 +425,7 @@ class Room extends EventEmitter
 			.catch((error) =>
 			{
 				logger.error('_handleProtooPeer() failed: %s', error.message);
-				logger.error('stack:\n' + error.stack);
+				logger.error(`stack:\n${error.stack}`);
 
 				protooPeer.close();
 			});
@@ -430,8 +435,8 @@ class Room extends EventEmitter
 	{
 		logger.debug('_sendOffer() [peerId:"%s"]', protooPeer.id);
 
-		let peerconnection = protooPeer.data.peerconnection;
-		let mediaPeer = peerconnection.peer;
+		const peerconnection = protooPeer.data.peerconnection;
+		const mediaPeer = peerconnection.peer;
 
 		return Promise.resolve()
 			.then(() =>
@@ -454,23 +459,23 @@ class Room extends EventEmitter
 			// Process the SDP answer from the peer.
 			.then((data) =>
 			{
-				let answer = data.answer;
+				const answer = data.answer;
 
 				return peerconnection.setRemoteDescription(answer);
 			})
 			.then(() =>
 			{
-				let oldMsids = protooPeer.data.msids;
+				const oldMsids = protooPeer.data.msids;
 
 				// Reset peer's msids.
 				protooPeer.data.msids = [];
 
-				let setMsids = new Set();
+				const setMsids = new Set();
 
 				// Update peer's msids information.
-				for (let rtpReceiver of mediaPeer.rtpReceivers)
+				for (const rtpReceiver of mediaPeer.rtpReceivers)
 				{
-					let msid = rtpReceiver.rtpParameters.userParameters.msid.split(/\s/)[0];
+					const msid = rtpReceiver.rtpParameters.userParameters.msid.split(/\s/)[0];
 
 					setMsids.add(msid);
 				}
@@ -478,7 +483,7 @@ class Room extends EventEmitter
 				protooPeer.data.msids = Array.from(setMsids);
 
 				// If msids changed, notify.
-				let sameValues = (
+				const sameValues = (
 					oldMsids.length == protooPeer.data.msids.length) &&
 					oldMsids.every((element, index) =>
 					{
@@ -502,7 +507,7 @@ class Room extends EventEmitter
 			.catch((error) =>
 			{
 				logger.error('_sendOffer() failed: %s', error);
-				logger.error('stack:\n' + error.stack);
+				logger.error(`stack:\n${error.stack}`);
 
 				logger.warn('resetting peerconnection');
 				peerconnection.reset();
@@ -514,8 +519,8 @@ class Room extends EventEmitter
 		if (this._mediaRoom.closed)
 			return;
 
-		let numPeers = this._mediaRoom.peers.length;
-		let previousMaxBitrate = this._maxBitrate;
+		const numPeers = this._mediaRoom.peers.length;
+		const previousMaxBitrate = this._maxBitrate;
 		let newMaxBitrate;
 
 		if (numPeers <= 2)
@@ -533,12 +538,12 @@ class Room extends EventEmitter
 		if (newMaxBitrate === previousMaxBitrate)
 			return;
 
-		for (let peer of this._mediaRoom.peers)
+		for (const peer of this._mediaRoom.peers)
 		{
 			if (!peer.capabilities || peer.closed)
 				continue;
 
-			for (let transport of peer.transports)
+			for (const transport of peer.transports)
 			{
 				if (transport.closed)
 					continue;
@@ -547,7 +552,8 @@ class Room extends EventEmitter
 			}
 		}
 
-		logger.log('_updateMaxBitrate() [num peers:%s, before:%skbps, now:%skbps]',
+		logger.log(
+			'_updateMaxBitrate() [num peers:%s, before:%skbps, now:%skbps]',
 			numPeers,
 			Math.round(previousMaxBitrate / 1000),
 			Math.round(newMaxBitrate / 1000));

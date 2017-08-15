@@ -8,10 +8,9 @@
   "main": "lib/index.js",
   "dependencies": {
     "colors": "^1.1.2",
-    "debug": "^2.6.8",
-    "express": "^4.15.3",
-    "mediasoup": "^1.2.5",
-    "protoo-server": "^1.1.4"
+    "debug": "^3.0.0",
+    "express": "^4.15.4",
+    "protoo-server": "^2.0.2"
   },
   "devDependencies": {
     "babel-plugin-transform-object-assign": "^6.22.0",

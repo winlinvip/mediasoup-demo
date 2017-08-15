@@ -18,7 +18,7 @@ module.exports =
 	{
 		// mediasoup Server settings.
 		logLevel : 'debug',
-		logTags :
+		logTags  :
 		[
 			'info',
 			// 'ice',
@@ -36,7 +36,7 @@ module.exports =
 		rtcMinPort       : 40000,
 		rtcMaxPort       : 49999,
 		// mediasoup Room settings.
-		roomCodecs :
+		roomCodecs       :
 		[
 			{
 				kind       : 'audio',
@@ -49,9 +49,9 @@ module.exports =
 				}
 			},
 			{
-				kind       : 'video',
-				name       : 'video/vp8',
-				clockRate  : 90000
+				kind      : 'video',
+				name      : 'video/vp8',
+				clockRate : 90000
 			}
 		],
 		// mediasoup per Peer Transport settings.

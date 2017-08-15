@@ -6,14 +6,14 @@ global-reset();
 @import './fonts';
 
 html {
-	font-family: 'Roboto';
+	height: 100%;
+	box-sizing: border-box;
 	background-image: url('/resources/images/body-bg-2.jpg');
 	background-attachment: fixed;
 	background-position: center;
 	background-size: cover;
 	background-repeat: no-repeat;
-	min-height: 100vh;
-	width: 100%;
+	font-family: 'Roboto';
 	font-weight: 400;
 
 	+desktop() {
@@ -26,25 +26,25 @@ html {
 }
 
 body {
+	height: 100%;
+	box-sizing: border-box;
 	background: none;
 }
 
-* {
-	box-sizing: border-box;
-	outline: none;
-}
-
 #mediasoup-demo-app-container {
-	min-height: 100vh;
+	height: 100%;
 	width: 100%;
+	box-sizing: border-box;
 
 	// Components
-	@import './components/App';
 	@import './components/Room';
-	@import './components/LocalVideo';
-	@import './components/RemoteVideo';
 	@import './components/Video';
-	@import './components/Stats';
+	@import './components/LocalView';
+
+	* {
+		box-sizing: border-box;
+		outline: none;
+	}
 }
 
 // Hack to detect in JS the current media query

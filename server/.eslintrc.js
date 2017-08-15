@@ -6,33 +6,18 @@ module.exports =
 		es6: true,
 		node: true
 	},
-	plugins:
-	[
-		'import',
-		'react'
-	],
 	extends:
 	[
-		'eslint:recommended',
-		'plugin:react/recommended'
+		'eslint:recommended'
 	],
-	settings:
-	{
-		react:
-		{
-			pragma: 'React',
-			version: '15'
-		}
-	},
+	settings: {},
 	parserOptions:
 	{
 		ecmaVersion: 6,
 		sourceType: 'module',
 		ecmaFeatures:
 		{
-			impliedStrict: true,
-			experimentalObjectRestSpread: true,
-			jsx: true
+			impliedStrict: true
 		}
 	},
 	rules:
@@ -40,7 +25,7 @@ module.exports =
 		'array-bracket-spacing': [ 2, 'always',
 		{
 			objectsInArrays: true,
-		  arraysInArrays: true
+			arraysInArrays: true
 		}],
 		'arrow-parens': [ 2, 'always' ],
 		'arrow-spacing': 2,
@@ -176,54 +161,8 @@ module.exports =
 		'space-before-function-paren': [ 2, 'never' ],
 		'space-in-parens': [ 2, 'never' ],
 		'spaced-comment': [ 2, 'always' ],
-		'strict': 2,
+		'strict': 0,
 		'valid-typeof': 2,
-		'yoda': 2,
-		// eslint-plugin-import options.
-		'import/extensions': 2,
-		'import/no-duplicates': 2,
-		// eslint-plugin-react options.
-		'jsx-quotes': [ 2, 'prefer-single' ],
-		'react/display-name': [ 2, { ignoreTranspilerName: false } ],
-		'react/forbid-prop-types': 0,
-		'react/jsx-boolean-value': 2,
-		'react/jsx-closing-bracket-location': 2,
-		'react/jsx-curly-spacing': 2,
-		'react/jsx-equals-spacing': 2,
-		'react/jsx-handler-names': 2,
-		'react/jsx-indent-props': [ 2, 'tab' ],
-		'react/jsx-indent': [ 2, 'tab' ],
-		'react/jsx-key': 2,
-		'react/jsx-max-props-per-line': 0,
-		'react/jsx-no-bind': 0,
-		'react/jsx-no-duplicate-props': 2,
-		'react/jsx-no-literals': 0,
-		'react/jsx-no-undef': 2,
-		'react/jsx-pascal-case': 2,
-		'react/jsx-sort-prop-types': 0,
-		'react/jsx-sort-props': 0,
-		'react/jsx-uses-react': 2,
-		'react/jsx-uses-vars': 2,
-		'react/no-danger': 2,
-		'react/no-deprecated': 2,
-		'react/no-did-mount-set-state': 2,
-		'react/no-did-update-set-state': 2,
-		'react/no-direct-mutation-state': 2,
-		'react/no-is-mounted': 2,
-		'react/no-multi-comp': 0,
-		'react/no-set-state': 0,
-		'react/no-string-refs': 0,
-		'react/no-unknown-property': 2,
-		'react/prefer-es6-class': 2,
-		'react/prop-types': 2,
-		'react/react-in-jsx-scope': 2,
-		'react/self-closing-comp': 2,
-		'react/sort-comp': 0,
-		'react/jsx-wrap-multilines': [ 2,
-		{
-			declaration: false,
-			assignment: false,
-			return: true
-		}]
+		'yoda': 2
 	}
 };
