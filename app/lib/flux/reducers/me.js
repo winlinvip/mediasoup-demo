@@ -2,6 +2,8 @@ const initialState =
 {
 	name             : null,
 	device           : null,
+	canSendMic       : false,
+	canSendWebcam    : false,
 	webcamInProgress : false,
 	producers        : [] // TODO: REMOVE
 };
@@ -15,6 +17,13 @@ const me = (state = initialState, action) =>
 			const { peerName, device } = action.payload;
 
 			return { ...state, name: peerName, device };
+		}
+
+		case 'SET_MEDIA_CAPABILITIES':
+		{
+			const { canSendMic, canSendWebcam } = action.payload;
+
+			return { ...state, canSendMic, canSendWebcam };
 		}
 
 		case 'SET_WEBCAM_IN_PROGRESS':
@@ -40,7 +49,7 @@ const me = (state = initialState, action) =>
 			const idx = state.producers.indexOf(producerId);
 
 			if (idx === -1)
-				throw new Error('PRODUCER_CLOSED error: idx === -1');
+				throw new Error('Producer not found');
 
 			const newProducers = state.producers.slice();
 

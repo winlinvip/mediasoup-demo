@@ -21,6 +21,14 @@ export const setRoomState = (state) =>
 	};
 };
 
+export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
+{
+	return {
+		type    : 'SET_MEDIA_CAPABILITIES',
+		payload : { canSendMic, canSendWebcam }
+	};
+};
+
 export const newProducer = (producer) =>
 {
 	return {
@@ -86,5 +94,53 @@ export const setWebcamInProgress = (flag) =>
 	return {
 		type    : 'SET_WEBCAM_IN_PROGRESS',
 		payload : { flag }
+	};
+};
+
+export const newPeer = (peer) =>
+{
+	return {
+		type    : 'NEW_PEER',
+		payload : { peer }
+	};
+};
+
+export const peerClosed = (peerName) =>
+{
+	return {
+		type    : 'PEER_CLOSED',
+		payload : { peerName }
+	};
+};
+
+export const newConsumer = (consumer) =>
+{
+	return {
+		type    : 'NEW_CONSUMER',
+		payload : { consumer }
+	};
+};
+
+export const consumerClosed = (consumerId, peerName) =>
+{
+	return {
+		type    : 'CONSUMER_CLOSED',
+		payload : { consumerId, peerName }
+	};
+};
+
+export const consumerPaused = (consumerId, originator) =>
+{
+	return {
+		type    : 'CONSUMER_PAUSED',
+		payload : { consumerId, originator }
+	};
+};
+
+export const consumerResumed = (consumerId, originator) =>
+{
+	return {
+		type    : 'CONSUMER_RESUMED',
+		payload : { consumerId, originator }
 	};
 };

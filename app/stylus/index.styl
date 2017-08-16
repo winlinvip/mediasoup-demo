@@ -8,7 +8,7 @@ global-reset();
 html {
 	height: 100%;
 	box-sizing: border-box;
-	background-image: url('/resources/images/body-bg-2.jpg');
+	background-image: url('/resources/images/body-bg.jpg');
 	background-attachment: fixed;
 	background-position: center;
 	background-size: cover;
@@ -39,7 +39,9 @@ body {
 	// Components
 	@import './components/Room';
 	@import './components/Video';
-	@import './components/LocalView';
+	@import './components/Me';
+	@import './components/Peers';
+	@import './components/Peer';
 
 	* {
 		box-sizing: border-box;

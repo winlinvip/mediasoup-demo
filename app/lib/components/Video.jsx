@@ -70,5 +70,5 @@ Video.propTypes =
 {
 	track   : PropTypes.any,
 	visible : PropTypes.bool.isRequired,
-	mirror  : PropTypes.bool.isRequired
+	mirror  : PropTypes.bool
 };

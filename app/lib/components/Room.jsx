@@ -1,19 +1,25 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
 import { FadeIn } from './transitions';
-import LocalView from './LocalView';
+import Me from './Me';
+import Peers from './Peers';
 
 const Room = ({ room }) =>
 {
 	return (
 		<FadeIn duration={1000}>
 			<div data-component='Room'>
-				<h1>ROOM ID: {room.id}</h1>
-				<h2>ROOM STATE: {room.state}</h2>
+				<div className='state'>
+					<div className={classnames('icon', room.state)} />
+					<p className='text'>{room.state}</p>
+				</div>
 
-				<div className='local-view-container'>
-					<LocalView />
+				<Peers />
+
+				<div className='me-container'>
+					<Me />
 				</div>
 			</div>
 		</FadeIn>

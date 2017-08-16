@@ -110,6 +110,7 @@ function handleProtooPeer(protooPeer)
 	});
 
 	// Emulate mediasoup-server notifications.
+
 	setTimeout(() =>
 	{
 		if (protooPeer.closed)
@@ -117,7 +118,25 @@ function handleProtooPeer(protooPeer)
 
 		protooPeer.send(
 			'mediasoup-notification', DATA.ALICE_WEBCAM_NEW_CONSUMER_NOTIFICATION);
-	}, 3000);
+	}, 2000);
+
+	setTimeout(() =>
+	{
+		if (protooPeer.closed)
+			return;
+
+		protooPeer.send(
+			'mediasoup-notification', DATA.BOB_NEW_PEER_NOTIFICATION);
+	}, 4000);
+
+	setTimeout(() =>
+	{
+		if (protooPeer.closed)
+			return;
+
+		protooPeer.send(
+			'mediasoup-notification', DATA.BOB_MIC_CONSUMER_PAUSED_NOTIFICATION);
+	}, 7000);
 }
 
 function handleMediasoupClientRequest(request, accept, reject)
@@ -137,7 +156,10 @@ function handleMediasoupClientRequest(request, accept, reject)
 
 		case 'joinRoom':
 		{
-			accept(DATA.JOIN_ROOM_RESPONSE);
+			setTimeout(() =>
+			{
+				accept(DATA.JOIN_ROOM_RESPONSE);
+			}, 600);
 
 			break;
 		}

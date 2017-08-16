@@ -5,12 +5,14 @@
   room :
   {
     id    : 'wqetr6yqe',
-    state : 'connected' // new/connecting/connected/disconnected/closed
+    state : 'connected' // new/connecting/connected/closed
   },
   me :
   {
     name             : 'bob',
     device           : 'Firefox 61',
+    canSendMic       : true,
+    canSendWebcam    : true,
     webcamInProgress : false,
     producers        : [ 1111, 1112 ] // TODO: REMOVE
   },
@@ -51,7 +53,7 @@
       id             : 5551,
       peerName       : 'alice',
       source         : 'mic', // mic/webcam
-      deviceLabel    : 'Default Microphone',
+      supported      : true,
       locallyPaused  : false,
       remotelyPaused : false,
       track          : MediaStreamTrack
@@ -61,10 +63,10 @@
       id             : 5552,
       peerName       : 'alice',
       source         : 'webcam',
-      deviceLabel    : 'HP Webcam Pro',
+      supported      : false,
       locallyPaused  : false,
       remotelyPaused : true,
-      track          : MediaStreamTrack
+      track          : null
     }
   }
 }

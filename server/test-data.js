@@ -131,7 +131,8 @@ exports.ROOM_RTP_CAPABILITIES =
 
 exports.QUERY_ROOM_RESPONSE =
 {
-	rtpCapabilities: exports.ROOM_RTP_CAPABILITIES
+	rtpCapabilities: exports.ROOM_RTP_CAPABILITIES,
+	__mandatoryCodecPayloadTypes: [ 8, 96, 100 ]
 };
 
 exports.JOIN_ROOM_RESPONSE =
@@ -186,26 +187,25 @@ exports.JOIN_ROOM_RESPONSE =
 			]
 		},
 		{
-			name: 'bob',
-			appData: 'Bob HP Laptop',
+			name: 'carol',
+			appData: 'Macbook Air',
 			consumers:
 			[
 				{
-					id: 6666,
+					id: 9999,
 					kind: 'audio',
 					paused: false,
-					appData: 'BOB_MIC',
+					appData: 'CAROL_MIC',
 					rtpParameters:
 					{
 						muxId: null,
 						codecs:
 						[
 							{
-								name: 'opus',
-								mimeType: 'audio/opus',
-								clockRate: 48000,
-								channels: 2,
-								payloadType: 96,
+								name: 'PCMA',
+								mimeType: 'audio/PCMA',
+								clockRate: 8000,
+								payloadType: 8,
 								rtcpFeedback: [],
 								parameters: {}
 							}
@@ -220,12 +220,12 @@ exports.JOIN_ROOM_RESPONSE =
 						encodings:
 						[
 							{
-								ssrc: 66666666
+								ssrc: 99999999
 							}
 						],
 						rtcp:
 						{
-							cname: 'BOBCNAME',
+							cname: 'CAROLCNAME',
 							reducedSize: true,
 							mux: true
 						}
@@ -298,6 +298,58 @@ exports.CREATE_TRANSPORT_2_RESPONSE =
 		],
 		role: 'auto'
 	}
+};
+
+exports.BOB_NEW_PEER_NOTIFICATION =
+{
+	method: 'newPeer',
+	notification: true,
+	name: 'bob',
+	appData: 'Bob HP Laptop',
+	consumers:
+	[
+		{
+			id: 6666,
+			kind: 'audio',
+			paused: false,
+			appData: 'BOB_MIC',
+			rtpParameters:
+			{
+				muxId: null,
+				codecs:
+				[
+					{
+						name: 'opus',
+						mimeType: 'audio/opus',
+						clockRate: 48000,
+						channels: 2,
+						payloadType: 96,
+						rtcpFeedback: [],
+						parameters: {}
+					}
+				],
+				headerExtensions:
+				[
+					{
+						uri: 'urn:ietf:params:rtp-hdrext:ssrc-audio-level',
+						id: 1
+					}
+				],
+				encodings:
+				[
+					{
+						ssrc: 66666666
+					}
+				],
+				rtcp:
+				{
+					cname: 'BOBCNAME',
+					reducedSize: true,
+					mux: true
+				}
+			}
+		}
+	]
 };
 
 exports.ALICE_WEBCAM_NEW_CONSUMER_NOTIFICATION =
@@ -380,4 +432,12 @@ exports.ALICE_WEBCAM_NEW_CONSUMER_NOTIFICATION =
 			mux: true
 		}
 	}
+};
+
+exports.BOB_MIC_CONSUMER_PAUSED_NOTIFICATION =
+{
+	method: 'consumerPaused',
+	notification: true,
+	id: 6666,
+	peerName: 'bob'
 };

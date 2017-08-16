@@ -1,0 +1,45 @@
+[data-component='Peer'] {
+	flex: 100 100 auto;
+	position: relative;
+	height: 100%;
+	width: 100%;
+
+	+mobile() {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	> .info {
+		position: absolute;
+		z-index: 1
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding: 4px;
+		background: linear-gradient(to bottom,
+			rgba(#3a1816, 0) 0%,
+			rgba(#3a1816, 0) 60%,
+			rgba(#3a1816, 0.6) 100%);
+
+		+desktop() {
+			align-items: center;
+		}
+
+		+mobile() {
+			align-items: flex-end;
+		}
+
+		> .name {
+			user-select: none;
+			pointer-events: none;
+			font-size: 12px;
+			color: rgba(#fff, 0.65);
+		}
+	}
+}

@@ -6,9 +6,10 @@ import * as appPropTypes from './appPropTypes';
 import * as actionCreators from '../flux/actionCreators';
 import Video from './Video';
 
-const LocalView = (props) =>
+const Me = (props) =>
 {
 	const {
+		connected,
 		me,
 		micProducer,
 		webcamProducer,
@@ -18,10 +19,25 @@ const LocalView = (props) =>
 		onAddWebcam
 	} = props;
 
-	const muted = (
-		Boolean(micProducer) &&
-		micProducer.locallyPaused
-	);
+	let micState;
+
+	if (!me.canSendMic)
+		micState = 'unsupported';
+	else if (!micProducer)
+		micState = 'unsupported';
+	else if (!micProducer.locallyPaused)
+		micState = 'on';
+	else if (micProducer.locallyPaused)
+		micState = 'off';
+
+	let webcamState;
+
+	if (!me.canSendWebcam)
+		webcamState = 'unsupported';
+	else if (webcamProducer)
+		webcamState = 'on';
+	else
+		webcamState = 'off';
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -30,27 +46,29 @@ const LocalView = (props) =>
 	);
 
 	return (
-		<div data-component='LocalView'>
-			<div className='controls'>
-				{micProducer ?
+		<div data-component='Me'>
+			{connected ?
+				<div className='controls'>
 					<div
-						className={classnames('button', 'muted', {
-							on  : muted,
-							off : !muted
-						})}
-						onClick={() => { muted ? onUnmuteMic() : onMuteMic(); }}
+						className={classnames('button', 'mic', micState)}
+						onClick={() =>
+						{
+							micState === 'on' ? onMuteMic() : onUnmuteMic();
+						}}
 					/>
-					:null
-				}
-				<div
-					className={classnames('button', 'webcam', {
-						disabled : me.webcamInProgress,
-						on       : Boolean(webcamProducer),
-						off      : !webcamProducer
-					})}
-					onClick={() => { webcamProducer ? onRemoveWebcam() : onAddWebcam(); }}
-				/>
-			</div>
+
+					<div
+						className={classnames('button', 'webcam', webcamState, {
+							disabled : me.webcamInProgress
+						})}
+						onClick={() =>
+						{
+							webcamState === 'on' ? onRemoveWebcam() : onAddWebcam();
+						}}
+					/>
+				</div>
+				:null
+			}
 
 			<div className='info'>
 				<p className='name'>
@@ -67,8 +85,9 @@ const LocalView = (props) =>
 	);
 };
 
-LocalView.propTypes =
+Me.propTypes =
 {
+	connected      : PropTypes.bool.isRequired,
 	me             : appPropTypes.Me.isRequired,
 	micProducer    : appPropTypes.Producer,
 	webcamProducer : appPropTypes.Producer,
@@ -87,6 +106,7 @@ const mapStateToProps = (state) =>
 		producersArray.find((producer) => producer.source === 'webcam');
 
 	return {
+		connected      : state.room.state === 'connected',
 		me             : state.me,
 		micProducer    : micProducer,
 		webcamProducer : webcamProducer
@@ -103,9 +123,9 @@ const mapDispatchToProps = (dispatch) =>
 	};
 };
 
-const LocalViewContainer = connect(
+const MeContainer = connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(LocalView);
+)(Me);
 
-export default LocalViewContainer;
+export default MeContainer;
