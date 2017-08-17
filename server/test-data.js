@@ -152,7 +152,7 @@ exports.JOIN_ROOM_RESPONSE =
 					id: 3333,
 					kind: 'audio',
 					paused: false,
-					appData: 'ALICE_MIC',
+					appData: { source: 'mic' },
 					rtpParameters:
 					{
 						muxId: null,
@@ -187,6 +187,82 @@ exports.JOIN_ROOM_RESPONSE =
 							mux: true
 						}
 					}
+				},
+				{
+					id: 4444,
+					kind: 'video',
+					appData: { source: 'webcam' },
+					rtpParameters:
+					{
+						muxId: null,
+						codecs:
+						[
+							{
+								name: 'VP8',
+								mimeType: 'video/VP8',
+								clockRate: 90000,
+								payloadType: 100,
+								rtcpFeedback:
+								[
+									{
+										parameter: '',
+										type: 'nack'
+									},
+									{
+										parameter: 'pli',
+										type: 'nack'
+									},
+									{
+										parameter: '',
+										type: 'goog-remb'
+									},
+									{
+										parameter: 'bar',
+										type: 'foo'
+									}
+								],
+								parameters: {}
+							},
+							{
+								name: 'rtx',
+								mimeType: 'video/rtx',
+								clockRate: 90000,
+								payloadType: 101,
+								rtcpFeedback: [],
+								parameters: {
+									apt: 100
+								}
+							}
+						],
+						headerExtensions:
+						[
+							{
+								kind: 'video',
+								uri: 'http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time',
+								id: 11
+							},
+							{
+								kind: 'video',
+								uri: 'http://foo.bar',
+								id: 12
+							}
+						],
+						encodings:
+						[
+							{
+								ssrc: 444444441,
+								rtx: {
+									ssrc: 444444442
+								}
+							}
+						],
+						rtcp:
+						{
+							cname: 'ALICECNAME',
+							reducedSize: true,
+							mux: true
+						}
+					}
 				}
 			]
 		},
@@ -195,7 +271,7 @@ exports.JOIN_ROOM_RESPONSE =
 			appData:
 			{
 				displayName: 'Carol McCain',
-				device: { name: 'Edge', version: '11' }
+				device: { name: 'Microsoft Edge', version: '11' }
 			},
 			consumers:
 			[
@@ -203,7 +279,7 @@ exports.JOIN_ROOM_RESPONSE =
 					id: 9999,
 					kind: 'audio',
 					paused: false,
-					appData: 'CAROL_MIC',
+					appData: { source: 'mic' },
 					rtpParameters:
 					{
 						muxId: null,
@@ -324,7 +400,7 @@ exports.BOB_NEW_PEER_NOTIFICATION =
 			id: 6666,
 			kind: 'audio',
 			paused: false,
-			appData: 'BOB_MIC',
+			appData: { source: 'mic' },
 			rtpParameters:
 			{
 				muxId: null,
@@ -364,15 +440,15 @@ exports.BOB_NEW_PEER_NOTIFICATION =
 	]
 };
 
-exports.ALICE_WEBCAM_NEW_CONSUMER_NOTIFICATION =
+exports.BOB_WEBCAM_NEW_CONSUMER_NOTIFICATION =
 {
 	method: 'newConsumer',
 	notification: true,
-	id: 4444,
-	peerName: 'alice',
+	id: 7777,
+	peerName: 'bob',
 	kind: 'video',
-	paused: true,
-	appData: 'ALICE_WEBCAM',
+	paused: false,
+	appData: { source: 'webcam' },
 	rtpParameters:
 	{
 		muxId: null,
@@ -431,15 +507,15 @@ exports.ALICE_WEBCAM_NEW_CONSUMER_NOTIFICATION =
 		encodings:
 		[
 			{
-				ssrc: 444444441,
+				ssrc: 777777771,
 				rtx: {
-					ssrc: 444444442
+					ssrc: 777777772
 				}
 			}
 		],
 		rtcp:
 		{
-			cname: 'ALICECNAME',
+			cname: 'BOBCNAME',
 			reducedSize: true,
 			mux: true
 		}
@@ -452,4 +528,20 @@ exports.BOB_MIC_CONSUMER_PAUSED_NOTIFICATION =
 	notification: true,
 	id: 6666,
 	peerName: 'bob'
+};
+
+exports.ALICE_WEBCAM_CONSUMER_PAUSED_NOTIFICATION =
+{
+	method: 'consumerPaused',
+	notification: true,
+	id: 4444,
+	peerName: 'alice'
+};
+
+exports.ALICE_WEBCAM_CONSUMER_RESUMED_NOTIFICATION =
+{
+	method: 'consumerResumed',
+	notification: true,
+	id: 4444,
+	peerName: 'alice'
 };

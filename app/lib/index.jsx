@@ -14,6 +14,7 @@ import randomString from 'random-string';
 import randomName from 'node-random-name';
 import Logger from './Logger';
 import * as utils from './utils';
+import * as cookiesManager from './cookiesManager';
 import * as actionCreators from './flux/actionCreators';
 import reducers from './flux/reducers';
 import roomClientMiddleware from './flux/roomClientMiddleware';
@@ -76,8 +77,9 @@ function run()
 		window.location = `#roomId=${roomId}`;
 	}
 
-	// TODO: Get displayName from cookie.
-	const displayName = randomName();
+	// Get displayName from cookie.
+	const userCookie = cookiesManager.getUser() || {};
+	const displayName = userCookie.displayName || randomName();
 	const device = getDeviceInfo();
 
 	store.dispatch(

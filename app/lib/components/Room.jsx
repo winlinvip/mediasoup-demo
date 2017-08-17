@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import ClipboardButton from 'react-clipboard.js';
 import * as appPropTypes from './appPropTypes';
 import { FadeIn } from './transitions';
 import Me from './Me';
@@ -14,6 +15,21 @@ const Room = ({ room }) =>
 				<div className='state'>
 					<div className={classnames('icon', room.state)} />
 					<p className='text'>{room.state}</p>
+				</div>
+
+				<div className='room-link-wrapper'>
+					<div className='room-link'>
+						<ClipboardButton
+							component='a'
+							className='link'
+							button-href={window.location.href}
+							data-clipboard-text={window.location.href}
+							onSuccess={() => {}}
+							onClick={() => {}} // Avoid link action.
+						>
+							copy room link
+						</ClipboardButton>
+					</div>
 				</div>
 
 				<Peers />

@@ -23,7 +23,8 @@
       id             : 1111,
       source         : 'mic', // mic/webcam
       locallyPaused  : true,
-      remotelyPaused : false
+      remotelyPaused : false,
+      track          : MediaStreamTrack
     },
     '1112' :
     {

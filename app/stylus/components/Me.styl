@@ -5,12 +5,12 @@
 
 	> .controls {
 		position: absolute;
-		z-index: 2
+		z-index: 10
 		top: 0;
 		left: 0;
 		right: 0;
 		display: flex;
-		flex-direction: row;
+		flex-direction:; row;
 		justify-content: flex-end;
 		align-items: center;
 
@@ -80,97 +80,4 @@
 			}
 		}
 	}
-
-	> .info {
-		position: absolute;
-		z-index: 1
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-end;
-		align-items: flex-start;
-		padding: 10px;
-		background: linear-gradient(to bottom,
-			rgba(#3a1816, 0) 0%,
-			rgba(#3a1816, 0) 60%,
-			rgba(#3a1816, 0.8) 100%);
-
-		> .displayName {
-			font-size: 13px;
-			color: rgba(#fff, 0.85);
-		}
-
-		> span.displayName {
-			user-select: none;
-
-			&.loading {
-				pointer-events: none;
-				animation: Me-displayName-loading .5s infinite linear;
-			}
-		}
-
-		> input.displayName {
-			border: none;
-			border-bottom: 1px solid #aeff00;
-			background-color: transparent;
-			-webkit-appearance: none !important;
-		}
-
-		> .row {
-			margin-top: 4px;
-			display: flex;
-			flex-direction: row;
-			justify-content: flex-start;
-			align-items: center;
-
-			> .device-icon {
-				height: 16px;
-				width: 16px;
-				margin-right: 2px;
-				background-position: center;
-				background-size: 100%;
-				background-repeat: no-repeat;
-				background-image: url('/resources/images/devices/unknown.svg');
-
-				&.Chrome {
-					background-image: url('/resources/images/devices/chrome_16x16.png');
-				}
-
-				&.Chromium {
-					background-image: url('/resources/images/devices/chromium_16x16.png');
-				}
-
-				&.Firefox {
-					background-image: url('/resources/images/devices/firefox_16x16.png');
-				}
-
-				&.Safari {
-					background-image: url('/resources/images/devices/safari_16x16.png');
-				}
-
-				&.MicrosoftEdge {
-					background-image: url('/resources/images/devices/edge_16x16.png');
-				}
-
-				&.Opera {
-					background-image: url('/resources/images/devices/opera_16x16.png');
-				}
-			}
-
-			> .device-version {
-				user-select: none;
-				pointer-events: none;
-				font-size: 11px;
-				color: rgba(#fff, 0.5);
-			}
-		}
-	}
-}
-
-@keyframes Me-displayName-loading {
-	0% { opacity: 0; }
-	75% { opacity: 0.5; }
 }

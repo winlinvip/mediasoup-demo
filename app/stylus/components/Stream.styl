@@ -1,0 +1,66 @@
+[data-component='Stream'] {
+	position: relative;
+	flex: 100 100 auto;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	background-color: rgba(#041918, 0.65);
+	background-image: url('/resources/images/buddy.svg');
+	background-position: bottom;
+	background-size: auto 85%;
+	background-repeat: no-repeat;
+	overflow: hidden;
+
+	> video {
+		flex: 100 100 auto;
+		height: 100%;
+		width: 100%;
+		object-fit: cover;
+		transition-property: opacity;
+		transition-duration: .15s;
+		background-color: rgba(#000, 0.75);
+
+		&.is-me {
+			transform: scaleX(-1);
+		}
+
+		&.hidden {
+			opacity: 0;
+			transition-duration: 0s;
+		}
+	}
+
+	> .volume {
+		position: absolute;
+		top: 0
+		bottom: 0;
+		right: 2px;
+		width: 10px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		> .bar {
+			width: 6px;
+			border-radius: 6px;
+			background: rgba(yellow, 0.65);
+			transition-property: height background-color;
+			transition-duration: 0.25s;
+
+			&.level0  { height: 0;    background-color: rgba(yellow, 0.65); }
+			&.level1  { height: 10%;  background-color: rgba(yellow, 0.65); }
+			&.level2  { height: 20%;  background-color: rgba(yellow, 0.65); }
+			&.level3  { height: 30%;  background-color: rgba(yellow, 0.65); }
+			&.level4  { height: 40%;  background-color: rgba(orange, 0.65); }
+			&.level5  { height: 50%;  background-color: rgba(orange, 0.65); }
+			&.level6  { height: 60%;  background-color: rgba(red, 0.65);    }
+			&.level7  { height: 70%;  background-color: rgba(red, 0.65);    }
+			&.level8  { height: 80%;  background-color: rgba(#000, 0.65);   }
+			&.level9  { height: 90%;  background-color: rgba(#000, 0.65);   }
+			&.level10 { height: 100%; background-color: rgba(#000, 0.65);   }
+		}
+	}
+}

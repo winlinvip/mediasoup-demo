@@ -2,10 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { RIEInput } from 'riek';
 import * as appPropTypes from './appPropTypes';
 import * as actionCreators from '../flux/actionCreators';
-import Video from './Video';
+import PeerInfo from './PeerInfo';
+import Stream from './Stream';
 
 const Me = (props) =>
 {
@@ -72,40 +72,17 @@ const Me = (props) =>
 				:null
 			}
 
-			<div className='info'>
-				<RIEInput
-					value={me.displayName || 'Edit Your Name'}
-					propName='displayName'
-					className='displayName'
-					classLoading='loading'
-					classInvalid='invalid'
-					shouldBlockWhileLoading
-					editProps={{
-						maxLength   : 20,
-						autoCorrect : false,
-						spellCheck  : false
-					}}
-					validate={(string) => string.length >= 3}
-					change={({ displayName }) => onSetDisplayName(displayName)}
-				/>
+			<PeerInfo
+				isMe
+				peer={me}
+				onSetDisplayName={(displayName) => onSetDisplayName(displayName)}
+			/>
 
-				<div className='row'>
-					<span
-						className={classnames(
-							'device-icon',
-							me.device.name.replace(/ +/g, '')
-						)}
-					/>
-					<span className='device-version'>{me.device.name} {me.device.version}</span>
-				</div>
-
-
-			</div>
-
-			<Video
-				track={webcamProducer ? webcamProducer.track : null}
+			<Stream
+				audioTrack={micProducer ? micProducer.track : null}
+				videoTrack={webcamProducer ? webcamProducer.track : null}
 				visible={videoVisible}
-				mirror
+				isMe
 			/>
 		</div>
 	);

@@ -152,3 +152,11 @@ export const consumerResumed = (consumerId, originator) =>
 		payload : { consumerId, originator }
 	};
 };
+
+export const consumerGotTrack = (consumerId, track) =>
+{
+	return {
+		type    : 'CONSUMER_GOT_TRACK',
+		payload : { consumerId, track }
+	};
+};

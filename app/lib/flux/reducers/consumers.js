@@ -49,6 +49,15 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
+		case 'CONSUMER_GOT_TRACK':
+		{
+			const { consumerId, track } = action.payload;
+			const consumer = state[consumerId];
+			const newConsumer = { ...consumer, track };
+
+			return { ...state, [consumerId]: newConsumer };
+		}
+
 		default:
 			return state;
 	}

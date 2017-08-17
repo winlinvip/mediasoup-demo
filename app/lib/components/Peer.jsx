@@ -1,22 +1,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
-import Video from './Video';
+import PeerInfo from './PeerInfo';
+import Stream from './Stream';
 
-const Peer = ({ peer }) =>
+const Peer = (props) =>
 {
-	const videoVisible = true; // TODO
+	const {
+		peer,
+		micConsumer,
+		webcamConsumer
+	} = props;
+
+	const videoVisible = (
+		Boolean(webcamConsumer) &&
+		!webcamConsumer.locallyPaused &&
+		!webcamConsumer.remotelyPaused
+	);
 
 	return (
 		<div data-component='Peer'>
-			<div className='info'>
-				<p className='name'>
-					{peer.name}
-				</p>
-			</div>
+			<PeerInfo
+				peer={peer}
+			/>
 
-			<Video
-				track={null}
+			<Stream
+				audioTrack={micConsumer ? micConsumer.track : null}
+				videoTrack={webcamConsumer ? webcamConsumer.track : null}
 				visible={videoVisible}
 			/>
 		</div>
@@ -25,14 +35,26 @@ const Peer = ({ peer }) =>
 
 Peer.propTypes =
 {
-	peer : appPropTypes.Peer.isRequired
+	peer           : appPropTypes.Peer.isRequired,
+	micConsumer    : appPropTypes.Consumer,
+	webcamConsumer : appPropTypes.Consumer
 };
 
 const mapStateToProps = (state, { name }) =>
 {
 	const peer = state.peers[name];
+	const consumersArray = peer.consumers
+		.map((consumerId) => state.consumers[consumerId]);
+	const micConsumer =
+		consumersArray.find((consumer) => consumer.source === 'mic');
+	const webcamConsumer =
+		consumersArray.find((consumer) => consumer.source === 'webcam');
 
-	return { peer };
+	return {
+		peer,
+		micConsumer,
+		webcamConsumer
+	};
 };
 
 const PeerContainer = connect(mapStateToProps)(Peer);

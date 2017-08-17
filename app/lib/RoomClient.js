@@ -2,6 +2,7 @@ import protooClient from 'protoo-client';
 import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import { getProtooUrl } from './urlFactory';
+import * as cookiesManager from './cookiesManager';
 import * as actionCreators from './flux/actionCreators';
 
 const logger = new Logger('RoomClient');
@@ -105,6 +106,9 @@ export default class RoomClient
 	setDisplayName(displayName)
 	{
 		logger.debug('setDisplayName() [displayName:"%s"]', displayName);
+
+		// Store in cookie.
+		cookiesManager.setUser({ displayName });
 
 		this._protoo.send('set-display-name', { displayName })
 			.catch((error) =>
@@ -350,6 +354,11 @@ export default class RoomClient
 	{
 		logger.debug('_joinRoom()');
 
+		// NOTE: We allow rejoining (room.join()) the same mediasoup Room when Protoo
+		// WebSocket re-connects, so we must clean existing event listeners. Otherwise
+		// they will be called twice after the reconnection.
+		this._room.removeAllListeners();
+
 		this._room.on('request', (request, callback, errback) =>
 		{
 			logger.debug(
@@ -476,7 +485,8 @@ export default class RoomClient
 						id             : producer.id,
 						source         : 'mic',
 						locallyPaused  : producer.locallyPaused,
-						remotelyPaused : false
+						remotelyPaused : producer.remotelyPaused,
+						track          : producer.track
 					}));
 
 				producer.on('closed', (originator) =>
@@ -578,7 +588,7 @@ export default class RoomClient
 						type           : this._getWebcamType(device),
 						resolution     : resolution,
 						locallyPaused  : producer.locallyPaused,
-						remotelyPaused : false,
+						remotelyPaused : producer.remotelyPaused,
 						track          : producer.track
 					}));
 
@@ -715,20 +725,11 @@ export default class RoomClient
 
 	_handleConsumer(consumer)
 	{
-		// TODO: receive it so get the track, or check if we cannot receive it!
-
-		let source;
-
-		if (consumer.kind === 'audio')
-			source = 'mic';
-		else if (consumer.kind === 'video')
-			source = 'webcam';
-
 		this._dispatch(actionCreators.newConsumer(
 			{
 				id             : consumer.id,
 				peerName       : consumer.peer.name,
-				source         : source,
+				source         : consumer.appData.source,
 				supported      : consumer.supported,
 				locallyPaused  : consumer.locallyPaused,
 				remotelyPaused : consumer.remotelyPaused,
@@ -762,5 +763,20 @@ export default class RoomClient
 
 			this._dispatch(actionCreators.consumerResumed(consumer.id, originator));
 		});
+
+		// Receive the consumer (if we can).
+		if (consumer.supported)
+		{
+			this._recvTransport.receive(consumer)
+				.then((track) =>
+				{
+					this._dispatch(actionCreators.consumerGotTrack(consumer.id, track));
+				})
+				.catch((error) =>
+				{
+					logger.error(
+						'unexpected error while receiving a new Consumer:%o', error);
+				});
+		}
 	}
 }
