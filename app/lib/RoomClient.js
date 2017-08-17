@@ -135,6 +135,9 @@ export default class RoomClient
 	{
 		logger.debug('removeWebcam()');
 
+		// Store in cookie.
+		cookiesManager.setDevices({ webcamEnabled: false });
+
 		return Promise.resolve()
 			.then(() =>
 			{
@@ -149,6 +152,9 @@ export default class RoomClient
 	addWebcam()
 	{
 		logger.debug('addWebcam()');
+
+		// Store in cookie.
+		cookiesManager.setDevices({ webcamEnabled: true });
 
 		return Promise.resolve()
 			.then(() =>
@@ -417,9 +423,14 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				// Add our webcam.
+				// Add our webcam (unless the cookie says no).
 				if (this._room.canSend('video'))
-					this.addWebcam();
+				{
+					const devicesCookie = cookiesManager.getDevices();
+
+					if (!devicesCookie || devicesCookie.webcamEnabled)
+						this.addWebcam();
+				}
 			})
 			.then(() =>
 			{

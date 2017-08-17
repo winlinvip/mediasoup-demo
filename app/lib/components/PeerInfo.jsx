@@ -7,7 +7,10 @@ import * as appPropTypes from './appPropTypes';
 const PeerInfo = ({ isMe, peer, onSetDisplayName }) =>
 {
 	return (
-		<div data-component='PeerInfo'>
+		<div
+			data-component='PeerInfo'
+			className={classnames({ 'is-me': isMe })}
+		>
 			{isMe ?
 				<RIEInput
 					value={peer.displayName || 'Edit Your Name'}

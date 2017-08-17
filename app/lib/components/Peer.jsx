@@ -12,6 +12,12 @@ const Peer = (props) =>
 		webcamConsumer
 	} = props;
 
+	const micEnabled = (
+		Boolean(micConsumer) &&
+		!micConsumer.locallyPaused &&
+		!micConsumer.remotelyPaused
+	);
+
 	const videoVisible = (
 		Boolean(webcamConsumer) &&
 		!webcamConsumer.locallyPaused &&
@@ -20,6 +26,24 @@ const Peer = (props) =>
 
 	return (
 		<div data-component='Peer'>
+			<div className='indicators'>
+				{!micEnabled ?
+					<div className='icon mic-off' />
+					:null
+				}
+				{!videoVisible ?
+					<div className='icon webcam-off' />
+					:null
+				}
+			</div>
+
+			{videoVisible && !webcamConsumer.supported ?
+				<div className='incompatible-video'>
+					<p>incompatible video</p>
+				</div>
+				:null
+			}
+
 			<PeerInfo
 				peer={peer}
 			/>
