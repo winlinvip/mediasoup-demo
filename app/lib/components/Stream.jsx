@@ -109,20 +109,21 @@ export default class Stream extends React.Component
 
 		this._hark = hark(stream);
 
-		this._hark.on('stopped_speaking', () =>
+		// eslint-disable-next-line no-unused-vars
+		this._hark.on('volume_change', (dBs, threshold) =>
 		{
-			this.setState({ volume: 0 });
-		});
+			// The exact formula to convert from dBs (-100..0) to linear (0..1) is:
+			//   Math.pow(10, dBs / 20)
+			// However it does not produce a visually useful output, so let exagerate
+			// it a bit. Also, let convert it from 0..1 to 0..10 and avoid value 1 to
+			// minimize component renderings.
+			let volume = Math.round(Math.pow(10, dBs / 85) * 10);
 
-		this._hark.on('volume_change', (volume, threshold) =>
-		{
-			if (volume < threshold)
-				return;
+			if (volume === 1)
+				volume = 0;
 
-			this.setState(
-				{
-					volume : Math.round((volume - threshold) * (-10) / threshold)
-				});
+			if (volume !== this.state.volume)
+				this.setState({ volume: volume });
 		});
 	}
 }
