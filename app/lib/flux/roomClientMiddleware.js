@@ -11,9 +11,10 @@ export default ({ dispatch }) => (next) =>
 		{
 			case 'JOIN_ROOM':
 			{
-				const { peerName, roomId } = action.payload;
+				const { roomId, peerName, displayName, device } = action.payload;
 
-				client = new RoomClient({ peerName, roomId, dispatch });
+				client = new RoomClient(
+					{ roomId, peerName, displayName, device, dispatch });
 
 				// TODO: TMP
 				global.CLIENT = client;
@@ -24,6 +25,15 @@ export default ({ dispatch }) => (next) =>
 			case 'LEAVE_ROOM':
 			{
 				client.close();
+
+				break;
+			}
+
+			case 'SET_DISPLAY_NAME':
+			{
+				const { displayName } = action.payload;
+
+				client.setDisplayName(displayName);
 
 				break;
 			}

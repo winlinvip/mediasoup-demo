@@ -1,6 +1,6 @@
 const initialState = {};
 
-const producers = (state = initialState, action) =>
+const peers = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
@@ -64,4 +64,4 @@ const producers = (state = initialState, action) =>
 	}
 };
 
-export default producers;
+export default peers;

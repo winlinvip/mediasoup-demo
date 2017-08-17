@@ -1,11 +1,11 @@
 const initialState =
 {
 	name             : null,
+	displayName      : null,
 	device           : null,
 	canSendMic       : false,
 	canSendWebcam    : false,
-	webcamInProgress : false,
-	producers        : [] // TODO: REMOVE
+	webcamInProgress : false
 };
 
 const me = (state = initialState, action) =>
@@ -14,9 +14,9 @@ const me = (state = initialState, action) =>
 	{
 		case 'JOIN_ROOM':
 		{
-			const { peerName, device } = action.payload;
+			const { peerName, displayName, device } = action.payload;
 
-			return { ...state, name: peerName, device };
+			return { ...state, name: peerName, displayName, device };
 		}
 
 		case 'SET_MEDIA_CAPABILITIES':
@@ -33,29 +33,11 @@ const me = (state = initialState, action) =>
 			return { ...state, webcamInProgress: flag };
 		}
 
-		// TODO: REMOVE
-		case 'NEW_PRODUCER':
+		case 'SET_DISPLAY_NAME':
 		{
-			const { producer } = action.payload;
-			const newProducers = [ ...state.producers, producer.id ];
+			const { displayName } = action.payload;
 
-			return { ...state, producers: newProducers };
-		}
-
-		// TODO: REMOVE
-		case 'PRODUCER_CLOSED':
-		{
-			const { producerId } = action.payload;
-			const idx = state.producers.indexOf(producerId);
-
-			if (idx === -1)
-				throw new Error('Producer not found');
-
-			const newProducers = state.producers.slice();
-
-			newProducers.splice(idx, 1);
-
-			return { ...state, producers: newProducers };
+			return { ...state, displayName };
 		}
 
 		default:

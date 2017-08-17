@@ -25,7 +25,7 @@ const VIDEO_CONSTRAINS =
 
 export default class RoomClient
 {
-	constructor({ peerName, roomId, dispatch })
+	constructor({ roomId, peerName, displayName, device, dispatch })
 	{
 		logger.debug(
 			'constructor() [peerName:"%s", roomId:"%s"]', peerName, roomId);
@@ -70,7 +70,7 @@ export default class RoomClient
 			resolution : 'vga'
 		};
 
-		this._join();
+		this._join({ displayName, device });
 	}
 
 	close()
@@ -101,6 +101,17 @@ export default class RoomClient
 
 	// 	return peer.getConsumerById(consumerId);
 	// }
+
+	setDisplayName(displayName)
+	{
+		logger.debug('setDisplayName() [displayName:"%s"]', displayName);
+
+		this._protoo.send('set-display-name', { displayName })
+			.catch((error) =>
+			{
+				logger.error('setDisplayName() | failed: %o', error);
+			});
+	}
 
 	muteMic()
 	{
@@ -262,7 +273,7 @@ export default class RoomClient
 	// 	consumer.pause();
 	// }
 
-	_join()
+	_join({ displayName, device })
 	{
 		this._dispatch(actionCreators.setRoomState('connecting'));
 
@@ -272,7 +283,7 @@ export default class RoomClient
 		{
 			logger.debug('protoo Peer "open" event');
 
-			this._joinRoom();
+			this._joinRoom({ displayName, device });
 		});
 
 		protoo.on('disconnected', () =>
@@ -335,7 +346,7 @@ export default class RoomClient
 		});
 	}
 
-	_joinRoom()
+	_joinRoom({ displayName, device })
 	{
 		logger.debug('_joinRoom()');
 
@@ -366,7 +377,7 @@ export default class RoomClient
 			this._handlePeer(peer);
 		});
 
-		this._room.join()
+		this._room.join(null, { displayName, device })
 			.then(() =>
 			{
 				// Create Transport for sending.
@@ -672,9 +683,10 @@ export default class RoomClient
 	{
 		this._dispatch(actionCreators.newPeer(
 			{
-				name      : peer.name,
-				device    : 'UNKNOWN', // TODO
-				consumers : []
+				name        : peer.name,
+				displayName : peer.appData.displayName,
+				device      : peer.appData.device,
+				consumers   : []
 			}));
 
 		for (const consumer of peer.consumers)

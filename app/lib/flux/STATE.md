@@ -10,11 +10,11 @@
   me :
   {
     name             : 'bob',
-    device           : 'Firefox 61',
+    displayName      : 'Bob McFLower',
+    device           : { name: 'Firefox', version: '61' },
     canSendMic       : true,
     canSendWebcam    : true,
-    webcamInProgress : false,
-    producers        : [ 1111, 1112 ] // TODO: REMOVE
+    webcamInProgress : false
   },
   producers :
   {
@@ -42,8 +42,9 @@
     'alice' :
     {
       name        : 'alice',
-      device    : 'Chrome 59',
-      consumers : [ 5551, 5552 ]
+      displayName : 'Alice Thomsom',
+      device      : { name: 'Chrome', version: '58' },
+      consumers   : [ 5551, 5552 ]
     }
   },
   consumers :

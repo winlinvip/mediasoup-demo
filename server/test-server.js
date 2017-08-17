@@ -100,6 +100,13 @@ function handleProtooPeer(protooPeer)
 				break;
 			}
 
+			case 'set-display-name':
+			{
+				setTimeout(accept, 2000);
+
+				break;
+			}
+
 			default:
 			{
 				logger.error('unknown request.method "%s"', request.method);

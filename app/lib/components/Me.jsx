@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { RIEInput } from 'riek';
 import * as appPropTypes from './appPropTypes';
 import * as actionCreators from '../flux/actionCreators';
 import Video from './Video';
@@ -13,6 +14,7 @@ const Me = (props) =>
 		me,
 		micProducer,
 		webcamProducer,
+		onSetDisplayName,
 		onMuteMic,
 		onUnmuteMic,
 		onRemoveWebcam,
@@ -71,9 +73,33 @@ const Me = (props) =>
 			}
 
 			<div className='info'>
-				<p className='name'>
-					{me.name}
-				</p>
+				<RIEInput
+					value={me.displayName || 'Edit Your Name'}
+					propName='displayName'
+					className='displayName'
+					classLoading='loading'
+					classInvalid='invalid'
+					shouldBlockWhileLoading
+					editProps={{
+						maxLength   : 20,
+						autoCorrect : false,
+						spellCheck  : false
+					}}
+					validate={(string) => string.length >= 3}
+					change={({ displayName }) => onSetDisplayName(displayName)}
+				/>
+
+				<div className='row'>
+					<span
+						className={classnames(
+							'device-icon',
+							me.device.name.replace(/ +/g, '')
+						)}
+					/>
+					<span className='device-version'>{me.device.name} {me.device.version}</span>
+				</div>
+
+
 			</div>
 
 			<Video
@@ -87,14 +113,15 @@ const Me = (props) =>
 
 Me.propTypes =
 {
-	connected      : PropTypes.bool.isRequired,
-	me             : appPropTypes.Me.isRequired,
-	micProducer    : appPropTypes.Producer,
-	webcamProducer : appPropTypes.Producer,
-	onMuteMic      : PropTypes.func.isRequired,
-	onUnmuteMic    : PropTypes.func.isRequired,
-	onRemoveWebcam : PropTypes.func.isRequired,
-	onAddWebcam    : PropTypes.func.isRequired
+	connected        : PropTypes.bool.isRequired,
+	me               : appPropTypes.Me.isRequired,
+	micProducer      : appPropTypes.Producer,
+	webcamProducer   : appPropTypes.Producer,
+	onSetDisplayName : PropTypes.func.isRequired,
+	onMuteMic        : PropTypes.func.isRequired,
+	onUnmuteMic      : PropTypes.func.isRequired,
+	onRemoveWebcam   : PropTypes.func.isRequired,
+	onAddWebcam      : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -116,6 +143,10 @@ const mapStateToProps = (state) =>
 const mapDispatchToProps = (dispatch) =>
 {
 	return {
+		onSetDisplayName : (displayName) =>
+		{
+			dispatch(actionCreators.setDisplayName(displayName));
+		},
 		onMuteMic      : () => dispatch(actionCreators.muteMic()),
 		onUnmuteMic    : () => dispatch(actionCreators.unmuteMic()),
 		onRemoveWebcam : () => dispatch(actionCreators.removeWebcam()),

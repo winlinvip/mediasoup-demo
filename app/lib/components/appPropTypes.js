@@ -12,14 +12,20 @@ export const Room = PropTypes.shape(
 			]).isRequired
 	});
 
+export const Device = PropTypes.shape(
+	{
+		name    : PropTypes.string.isRequired,
+		version : PropTypes.string.isRequired
+	});
+
 export const Me = PropTypes.shape(
 	{
 		name             : PropTypes.string.isRequired,
-		device           : PropTypes.string.isRequired,
+		displayName      : PropTypes.string,
+		device           : Device.isRequired,
 		canSendMic       : PropTypes.bool.isRequired,
 		canSendWebcam    : PropTypes.bool.isRequired,
-		webcamInProgress : PropTypes.bool.isRequired,
-		producers        : PropTypes.arrayOf(PropTypes.number).isRequired
+		webcamInProgress : PropTypes.bool.isRequired
 	});
 
 export const Producer = PropTypes.shape(
@@ -36,9 +42,10 @@ export const Producer = PropTypes.shape(
 
 export const Peer = PropTypes.shape(
 	{
-		name      : PropTypes.string.isRequired,
-		device    : PropTypes.string.isRequired,
-		consumers : PropTypes.arrayOf(PropTypes.number).isRequired
+		name        : PropTypes.string.isRequired,
+		displayName : PropTypes.string,
+		device      : Device.isRequired,
+		consumers   : PropTypes.arrayOf(PropTypes.number).isRequired
 	});
 
 export const Consumer = PropTypes.shape(

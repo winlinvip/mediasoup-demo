@@ -11,6 +11,7 @@ import { createLogger as createReduxLogger } from 'redux-logger';
 import { getDeviceInfo } from 'mediasoup-client';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import randomString from 'random-string';
+import randomName from 'node-random-name';
 import Logger from './Logger';
 import * as utils from './utils';
 import * as actionCreators from './flux/actionCreators';
@@ -75,17 +76,19 @@ function run()
 		window.location = `#roomId=${roomId}`;
 	}
 
+	// TODO: Get displayName from cookie.
+	const displayName = randomName();
+	const device = getDeviceInfo();
+
+	store.dispatch(
+		actionCreators.joinRoom({ roomId, peerName, displayName, device }));
+
 	render(
 		<Provider store={store}>
 			<Room />
 		</Provider>,
 		document.getElementById('mediasoup-demo-app-container')
 	);
-
-	const device = `${getDeviceInfo().name} ${getDeviceInfo().version}`;
-
-	store.dispatch(
-		actionCreators.joinRoom(peerName, roomId, device));
 }
 
 // TODO: TMP

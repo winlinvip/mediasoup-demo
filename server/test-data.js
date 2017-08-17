@@ -141,7 +141,11 @@ exports.JOIN_ROOM_RESPONSE =
 	[
 		{
 			name: 'alice',
-			appData: 'Alice iPad Pro',
+			appData:
+			{
+				displayName: 'Alice Thomsom',
+				device: { name: 'Firefox', version: '50' }
+			},
 			consumers:
 			[
 				{
@@ -188,7 +192,11 @@ exports.JOIN_ROOM_RESPONSE =
 		},
 		{
 			name: 'carol',
-			appData: 'Macbook Air',
+			appData:
+			{
+				displayName: 'Carol McCain',
+				device: { name: 'Edge', version: '11' }
+			},
 			consumers:
 			[
 				{
@@ -305,7 +313,11 @@ exports.BOB_NEW_PEER_NOTIFICATION =
 	method: 'newPeer',
 	notification: true,
 	name: 'bob',
-	appData: 'Bob HP Laptop',
+	appData:
+	{
+		displayName: 'Bob Smith',
+		device: { name: 'Safari', version: '11' }
+	},
 	consumers:
 	[
 		{

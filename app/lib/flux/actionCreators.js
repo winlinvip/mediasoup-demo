@@ -1,8 +1,8 @@
-export const joinRoom = (peerName, roomId, device) =>
+export const joinRoom = ({ roomId, peerName, displayName, device }) =>
 {
 	return {
 		type    : 'JOIN_ROOM',
-		payload : { peerName, roomId, device }
+		payload : { roomId, peerName, displayName, device }
 	};
 };
 
@@ -26,6 +26,14 @@ export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
 	return {
 		type    : 'SET_MEDIA_CAPABILITIES',
 		payload : { canSendMic, canSendWebcam }
+	};
+};
+
+export const setDisplayName = (displayName) =>
+{
+	return {
+		type    : 'SET_DISPLAY_NAME',
+		payload : { displayName }
 	};
 };
 
