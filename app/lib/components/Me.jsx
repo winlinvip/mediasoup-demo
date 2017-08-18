@@ -18,7 +18,8 @@ const Me = (props) =>
 		onMuteMic,
 		onUnmuteMic,
 		onRemoveWebcam,
-		onAddWebcam
+		onAddWebcam,
+		onChangeWebcam
 	} = props;
 
 	let micState;
@@ -40,6 +41,13 @@ const Me = (props) =>
 		webcamState = 'on';
 	else
 		webcamState = 'off';
+
+	let changeWebcamState;
+
+	if (Boolean(webcamProducer) && me.canChangeWebcam)
+		changeWebcamState = 'on';
+	else
+		changeWebcamState = 'unsupported';
 
 	const videoVisible = (
 		Boolean(webcamProducer) &&
@@ -67,6 +75,13 @@ const Me = (props) =>
 						{
 							webcamState === 'on' ? onRemoveWebcam() : onAddWebcam();
 						}}
+					/>
+
+					<div
+						className={classnames('button', 'change-webcam', changeWebcamState, {
+							disabled : me.webcamInProgress
+						})}
+						onClick={() => onChangeWebcam()}
 					/>
 				</div>
 				:null
@@ -98,7 +113,8 @@ Me.propTypes =
 	onMuteMic        : PropTypes.func.isRequired,
 	onUnmuteMic      : PropTypes.func.isRequired,
 	onRemoveWebcam   : PropTypes.func.isRequired,
-	onAddWebcam      : PropTypes.func.isRequired
+	onAddWebcam      : PropTypes.func.isRequired,
+	onChangeWebcam   : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -127,7 +143,8 @@ const mapDispatchToProps = (dispatch) =>
 		onMuteMic      : () => dispatch(actionCreators.muteMic()),
 		onUnmuteMic    : () => dispatch(actionCreators.unmuteMic()),
 		onRemoveWebcam : () => dispatch(actionCreators.removeWebcam()),
-		onAddWebcam    : () => dispatch(actionCreators.addWebcam())
+		onAddWebcam    : () => dispatch(actionCreators.addWebcam()),
+		onChangeWebcam : () => dispatch(actionCreators.changeWebcam())
 	};
 };
 

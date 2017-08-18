@@ -31,6 +31,14 @@ export const setMediaCapabilities = ({ canSendMic, canSendWebcam }) =>
 	};
 };
 
+export const setCanChangeWebcam = (flag) =>
+{
+	return {
+		type    : 'SET_CAN_CHANGE_WEBCAM',
+		payload : flag
+	};
+};
+
 export const setDisplayName = (displayName) =>
 {
 	return {
@@ -96,6 +104,13 @@ export const addWebcam = () =>
 {
 	return {
 		type : 'ADD_WEBCAM'
+	};
+};
+
+export const changeWebcam = () =>
+{
+	return {
+		type : 'CHANGE_WEBCAM'
 	};
 };
 

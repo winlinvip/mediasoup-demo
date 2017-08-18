@@ -101,33 +101,33 @@ global.ACTION_CREATORS = actionCreators;
 
 // TODO: Test notifications
 
-global.TEST_NOTIFICATIONS = () =>
-{
-	store.dispatch(actionCreators.showNotification(
-		{
-			type : 'info',
-			text : 'Info notification 1'
-		}));
+// global.TEST_NOTIFICATIONS = () =>
+// {
+// 	store.dispatch(actionCreators.showNotification(
+// 		{
+// 			type : 'info',
+// 			text : 'Info notification 1'
+// 		}));
 
-	setTimeout(() =>
-	{
-		store.dispatch(actionCreators.showNotification(
-			{
-				type : 'error',
-				text : 'Errror !!! something errible happened'
-			}));
-	}, 1000);
+// 	setTimeout(() =>
+// 	{
+// 		store.dispatch(actionCreators.showNotification(
+// 			{
+// 				type : 'error',
+// 				text : 'Errror !!! something errible happened'
+// 			}));
+// 	}, 1000);
 
-	setTimeout(() =>
-	{
-		store.dispatch(actionCreators.showNotification(
-			{
-				type    : 'info',
-				text    : 'Info notification 2 Info notification 2 Info notification 2 Info notification 2',
-				timeout : 4000
-			}));
-	}, 2000);
-};
+// 	setTimeout(() =>
+// 	{
+// 		store.dispatch(actionCreators.showNotification(
+// 			{
+// 				type    : 'info',
+// 				text    : 'Info notification 2 Info notification 2 Info notification 2 Info notification 2',
+// 				timeout : 4000
+// 			}));
+// 	}, 2000);
+// };
 
 // global.TEST_NOTIFICATIONS();
 // setInterval(global.TEST_NOTIFICATIONS, 5000);

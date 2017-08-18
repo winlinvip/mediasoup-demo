@@ -69,6 +69,15 @@ export default ({ dispatch }) => (next) =>
 
 				break;
 			}
+
+			case 'CHANGE_WEBCAM':
+			{
+				dispatch(actionCreators.setWebcamInProgress(true));
+				client.changeWebcam()
+					.then(() => dispatch(actionCreators.setWebcamInProgress(false)));
+
+				break;
+			}
 		}
 
 		return next(action);

@@ -25,6 +25,7 @@ export const Me = PropTypes.shape(
 		device           : Device.isRequired,
 		canSendMic       : PropTypes.bool.isRequired,
 		canSendWebcam    : PropTypes.bool.isRequired,
+		canChangeWebcam  : PropTypes.bool.isRequired,
 		webcamInProgress : PropTypes.bool.isRequired
 	});
 

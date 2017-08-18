@@ -14,6 +14,7 @@
     device           : { name: 'Firefox', version: '61' },
     canSendMic       : true,
     canSendWebcam    : true,
+    canChangeWebcam  : false,
     webcamInProgress : false
   },
   producers :

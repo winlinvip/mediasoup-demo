@@ -342,16 +342,6 @@ export default class RoomClient
 					break;
 				}
 
-				case 'activespeaker':
-				{
-					// let const = request.data;
-
-					// this.emit('activespeaker', data.peer, data.level);
-					// accept();
-
-					break;
-				}
-
 				default:
 				{
 					logger.error('unknown protoo method "%s"', request.method);
@@ -693,8 +683,8 @@ export default class RoomClient
 				else if (!this._webcams.has(currentWebcamId))
 					this._webcam.device = array[0];
 
-				// TODO
-				// this.emit('numwebcams', len);
+				this._dispatch(
+					actionCreators.setCanChangeWebcam(this._webcams.size >= 2));
 			});
 	}
 
@@ -776,7 +766,7 @@ export default class RoomClient
 				supported      : consumer.supported,
 				locallyPaused  : consumer.locallyPaused,
 				remotelyPaused : consumer.remotelyPaused,
-				track          : null // TODO
+				track          : null
 			}));
 
 		consumer.on('closed', (originator) =>
