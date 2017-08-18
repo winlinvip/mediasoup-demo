@@ -181,10 +181,6 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
-				this._webcamProducer.close();
-			})
-			.then(() =>
-			{
 				return this._updateWebcams();
 			})
 			.then(() =>
@@ -211,7 +207,30 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				return this._setWebcamProducer();
+				const { device, resolution } = this._webcam;
+
+				if (!device)
+					throw new Error('no webcam devices');
+
+				return navigator.mediaDevices.getUserMedia(
+					{
+						video :
+						{
+							deviceId : { exact: device.deviceId },
+							...VIDEO_CONSTRAINS[resolution]
+						}
+					});
+			})
+			.then((stream) =>
+			{
+				const track = stream.getVideoTracks()[0];
+
+				return this._webcamProducer.replaceTrack(track);
+			})
+			.then((newTrack) =>
+			{
+				this._dispatch(
+					actionCreators.replaceProducerTrack(this._webcamProducer.id, newTrack));
 			})
 			.catch((error) =>
 			{
@@ -250,11 +269,27 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				this._webcamProducer.close();
+				const { device, resolution } = this._webcam;
+
+				return navigator.mediaDevices.getUserMedia(
+					{
+						video :
+						{
+							deviceId : { exact: device.deviceId },
+							...VIDEO_CONSTRAINS[resolution]
+						}
+					});
 			})
-			.then(() =>
+			.then((stream) =>
 			{
-				return this._setWebcamProducer();
+				const track = stream.getVideoTracks()[0];
+
+				return this._webcamProducer.replaceTrack(track);
+			})
+			.then((newTrack) =>
+			{
+				this._dispatch(
+					actionCreators.replaceProducerTrack(this._webcamProducer.id, newTrack));
 			})
 			.catch((error) =>
 			{
@@ -263,28 +298,6 @@ export default class RoomClient
 				this._webcam.resolution = oldResolution;
 			});
 	}
-
-	// pauseRemoteVideo(peerName, consumerId)
-	// {
-	// 	logger.debug(
-	// 		'pauseRemoteVideo() [peerName:"%s", consumerId:%d', peerName, consumerId);
-
-	// 	const peer = this._room.getPeerByName(peerName);
-	// 	const consumer = peer.getConsumerById(consumerId);
-
-	// 	consumer.pause();
-	// }
-
-	// resumeRemoteVideo(peerName, consumerId)
-	// {
-	// 	logger.debug(
-	// 		'resumeRemoteVideo() [peerName:"%s", consumerId:%d', peerName, consumerId);
-
-	// 	const peer = this._room.getPeerByName(peerName);
-	// 	const consumer = peer.getConsumerById(consumerId);
-
-	// 	consumer.pause();
-	// }
 
 	_join({ displayName, device })
 	{

@@ -79,6 +79,14 @@ export const producerResumed = (producerId, originator) =>
 	};
 };
 
+export const replaceProducerTrack = (producerId, track) =>
+{
+	return {
+		type    : 'REPLACE_PRODUCER_TRACK',
+		payload : { producerId, track }
+	};
+};
+
 export const muteMic = () =>
 {
 	return {

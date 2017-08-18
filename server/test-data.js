@@ -107,6 +107,38 @@ exports.ROOM_RTP_CAPABILITIES =
 			parameters: {
 				apt: 100
 			}
+		},
+		{
+			name: 'H264',
+			mimeType: 'video/H264',
+			kind: 'video',
+			clockRate: 90000,
+			preferredPayloadType: 111,
+			rtcpFeedback:
+			[
+				{
+					parameter: '',
+					type: 'nack'
+				},
+				{
+					parameter: 'pli',
+					type: 'nack'
+				},
+				{
+					parameter: '',
+					type: 'goog-remb'
+				},
+				{
+					parameter: 'bar',
+					type: 'foo'
+				}
+			],
+			parameters:
+			{
+				'level-asymmetry-allowed': 1,
+				'packetization-mode': 1,
+				'profile-level-id': '42e01f'
+			}
 		}
 	],
 	headerExtensions: [
@@ -132,7 +164,7 @@ exports.ROOM_RTP_CAPABILITIES =
 exports.QUERY_ROOM_RESPONSE =
 {
 	rtpCapabilities: exports.ROOM_RTP_CAPABILITIES,
-	__mandatoryCodecPayloadTypes: [ 8, 96, 100 ]
+	// mandatoryCodecPayloadTypes: [ 8, 96, 100 ]
 	// mandatoryCodecPayloadTypes: [ 97 ]
 };
 

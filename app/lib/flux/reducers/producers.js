@@ -49,6 +49,15 @@ const producers = (state = initialState, action) =>
 			return { ...state, [producerId]: newProducer };
 		}
 
+		case 'REPLACE_PRODUCER_TRACK':
+		{
+			const { producerId, track } = action.payload;
+			const producer = state[producerId];
+			const newProducer = { ...producer, track };
+
+			return { ...state, [producerId]: newProducer };
+		}
+
 		default:
 			return state;
 	}
