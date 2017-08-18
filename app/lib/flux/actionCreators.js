@@ -1,3 +1,5 @@
+import randomString from 'random-string';
+
 export const joinRoom = ({ roomId, peerName, displayName, device }) =>
 {
 	return {
@@ -158,5 +160,55 @@ export const consumerGotTrack = (consumerId, track) =>
 	return {
 		type    : 'CONSUMER_GOT_TRACK',
 		payload : { consumerId, track }
+	};
+};
+
+export const addNotification = (notification) =>
+{
+	return {
+		type    : 'ADD_NOTIFICATION',
+		payload : { notification }
+	};
+};
+
+export const deleteNotification = (notificationId) =>
+{
+	return {
+		type    : 'REMOVE_NOTIFICATION',
+		payload : { notificationId }
+	};
+};
+
+export const showNotification = ({ type = 'info', text, timeout }) =>
+{
+	if (!timeout)
+	{
+		switch (type)
+		{
+			case 'info':
+				timeout = 2000;
+				break;
+			case 'error':
+				timeout = 6000;
+				break;
+		}
+	}
+
+	const notification =
+	{
+		id      : randomString({ length: 6 }).toLowerCase(),
+		type    : type,
+		text    : text,
+		timeout : timeout
+	};
+
+	return (dispatch) =>
+	{
+		dispatch(addNotification(notification));
+
+		setTimeout(() =>
+		{
+			dispatch(deleteNotification(notification.id));
+		}, timeout);
 	};
 };

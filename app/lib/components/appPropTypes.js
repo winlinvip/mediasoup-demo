@@ -58,3 +58,10 @@ export const Consumer = PropTypes.shape(
 		remotelyPaused : PropTypes.bool.isRequired,
 		track          : PropTypes.any
 	});
+
+export const Notification = PropTypes.shape(
+	{
+		id      : PropTypes.string.isRequired,
+		type    : PropTypes.oneOf([ 'info', 'error' ]).isRequired,
+		timeout : PropTypes.number
+	});

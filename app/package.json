@@ -26,6 +26,7 @@
     "react-transition-group": "^2.2.0",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0",
     "riek": "^1.1.0",
     "url-parse": "^1.1.9"
   },

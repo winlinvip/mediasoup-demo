@@ -4,6 +4,7 @@ import me from './me';
 import producers from './producers';
 import peers from './peers';
 import consumers from './consumers';
+import notifications from './notifications';
 
 const reducers = combineReducers(
 	{
@@ -11,7 +12,8 @@ const reducers = combineReducers(
 		me,
 		producers,
 		peers,
-		consumers
+		consumers,
+		notifications
 	});
 
 export default reducers;

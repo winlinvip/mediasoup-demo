@@ -18,7 +18,7 @@
   },
   producers :
   {
-    '1111' :
+    1111 :
     {
       id             : 1111,
       source         : 'mic', // mic/webcam
@@ -26,7 +26,7 @@
       remotelyPaused : false,
       track          : MediaStreamTrack
     },
-    '1112' :
+    1112 :
     {
       id             : 1112,
       source         : 'webcam', // mic/webcam
@@ -50,7 +50,7 @@
   },
   consumers :
   {
-    '5551' :
+    5551 :
     {
       id             : 5551,
       peerName       : 'alice',
@@ -60,7 +60,7 @@
       remotelyPaused : false,
       track          : MediaStreamTrack
     },
-    '5552' :
+    5552 :
     {
       id             : 5552,
       peerName       : 'alice',
@@ -70,6 +70,19 @@
       remotelyPaused : true,
       track          : null
     }
-  }
+  },
+  notifications :
+  [
+    {
+      id     : 'qweasdw43we',
+      type   : 'info' // info/error
+      text   : 'You joined the room'
+    },
+    {
+      id     : 'j7sdhkjjkcc',
+      type   : 'error'
+      text   : 'Could not add webcam'
+    }
+  ]
 }
 ```

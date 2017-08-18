@@ -300,6 +300,12 @@ export default class RoomClient
 		{
 			logger.warn('protoo Peer "disconnected" event');
 
+			this._dispatch(actionCreators.showNotification(
+				{
+					type : 'error',
+					text : 'WebSocket disconnected'
+				}));
+
 			// Leave Room.
 			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
 			catch (error) {}
@@ -436,19 +442,27 @@ export default class RoomClient
 			{
 				this._dispatch(actionCreators.setRoomState('connected'));
 
+				this._dispatch(actionCreators.showNotification(
+					{
+						text : 'You are in the room'
+					}));
+
 				const peers = this._room.peers;
 
 				for (const peer of peers)
 				{
-					this._handlePeer(peer);
+					this._handlePeer(peer, { notify: false });
 				}
 			})
 			.catch((error) =>
 			{
 				logger.error('_joinRoom() failed:%o', error);
 
-				// TODO: REMOVE
-				global.JOIN_ERROR = error;
+				this._dispatch(actionCreators.showNotification(
+					{
+						type : 'error',
+						text : `Could not join the room: ${error.toString()}`
+					}));
 
 				this.close();
 			});
@@ -700,15 +714,25 @@ export default class RoomClient
 		}
 	}
 
-	_handlePeer(peer)
+	_handlePeer(peer, { notify = true } = {})
 	{
+		const displayName = peer.appData.displayName;
+
 		this._dispatch(actionCreators.newPeer(
 			{
 				name        : peer.name,
-				displayName : peer.appData.displayName,
+				displayName : displayName,
 				device      : peer.appData.device,
 				consumers   : []
 			}));
+
+		if (notify)
+		{
+			this._dispatch(actionCreators.showNotification(
+				{
+					text : `${displayName} joined the room`
+				}));
+		}
 
 		for (const consumer of peer.consumers)
 		{
@@ -722,6 +746,14 @@ export default class RoomClient
 				peer.name, originator);
 
 			this._dispatch(actionCreators.peerClosed(peer.name));
+
+			if (this._room.joined)
+			{
+				this._dispatch(actionCreators.showNotification(
+					{
+						text : `${displayName} left the room`
+					}));
+			}
 		});
 
 		peer.on('newconsumer', (consumer) =>

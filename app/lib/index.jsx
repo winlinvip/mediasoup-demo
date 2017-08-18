@@ -7,6 +7,7 @@ import {
 	applyMiddleware as applyFluxMiddleware,
 	createStore as createFluxStore
 } from 'redux';
+import thunk from 'redux-thunk';
 import { createLogger as createReduxLogger } from 'redux-logger';
 import { getDeviceInfo } from 'mediasoup-client';
 import injectTapEventPlugin from 'react-tap-event-plugin';
@@ -41,6 +42,7 @@ if (process.env.NODE_ENV === 'development')
 	reduxMiddlewares.push(fluxLogger);
 }
 
+reduxMiddlewares.push(thunk);
 reduxMiddlewares.push(roomClientMiddleware);
 
 const store = createFluxStore(
@@ -97,13 +99,35 @@ function run()
 global.STORE = store;
 global.ACTION_CREATORS = actionCreators;
 
-// setTimeout(() =>
-// {
-// 	global.STORE.dispatch(global.ACTION_CREATORS.joinRoom('alice', 'abcd1234'));
-// }, 500);
+// TODO: Test notifications
 
-// setTimeout(() =>
-// {
-// 	global.STORE.dispatch(global.ACTION_CREATORS.leaveRoom());
-// }, 1000);
+global.TEST_NOTIFICATIONS = () =>
+{
+	store.dispatch(actionCreators.showNotification(
+		{
+			type : 'info',
+			text : 'Info notification 1'
+		}));
 
+	setTimeout(() =>
+	{
+		store.dispatch(actionCreators.showNotification(
+			{
+				type : 'error',
+				text : 'Errror !!! something errible happened'
+			}));
+	}, 1000);
+
+	setTimeout(() =>
+	{
+		store.dispatch(actionCreators.showNotification(
+			{
+				type    : 'info',
+				text    : 'Info notification 2 Info notification 2 Info notification 2 Info notification 2',
+				timeout : 4000
+			}));
+	}, 2000);
+};
+
+// global.TEST_NOTIFICATIONS();
+// setInterval(global.TEST_NOTIFICATIONS, 5000);

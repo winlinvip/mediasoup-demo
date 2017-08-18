@@ -1,17 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import ClipboardButton from 'react-clipboard.js';
 import * as appPropTypes from './appPropTypes';
+import * as actionCreators from '../flux/actionCreators';
 import { FadeIn } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
+import Notifications from './Notifications';
 
-const Room = ({ room }) =>
+const Room = ({ room, onRoomLinkCopy }) =>
 {
 	return (
 		<FadeIn duration={1000}>
 			<div data-component='Room'>
+				<Notifications />
+
 				<div className='state'>
 					<div className={classnames('icon', room.state)} />
 					<p className='text'>{room.state}</p>
@@ -24,7 +29,7 @@ const Room = ({ room }) =>
 							className='link'
 							button-href={window.location.href}
 							data-clipboard-text={window.location.href}
-							onSuccess={() => {}}
+							onSuccess={onRoomLinkCopy}
 							onClick={() => {}} // Avoid link action.
 						>
 							copy room link
@@ -44,7 +49,8 @@ const Room = ({ room }) =>
 
 Room.propTypes =
 {
-	room : appPropTypes.Room.isRequired
+	room           : appPropTypes.Room.isRequired,
+	onRoomLinkCopy : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -52,6 +58,23 @@ const mapStateToProps = (state) =>
 	return { room: state.room };
 };
 
-const RoomContainer = connect(mapStateToProps)(Room);
+const mapDispatchToProps = (dispatch) =>
+{
+	return {
+		onRoomLinkCopy : () =>
+		{
+			dispatch(actionCreators.showNotification(
+				{
+					text : 'Room link copied to the clipboard'
+				}));
+		}
+	};
+};
+
+
+const RoomContainer = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Room);
 
 export default RoomContainer;

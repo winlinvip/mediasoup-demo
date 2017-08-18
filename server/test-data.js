@@ -133,6 +133,7 @@ exports.QUERY_ROOM_RESPONSE =
 {
 	rtpCapabilities: exports.ROOM_RTP_CAPABILITIES,
 	__mandatoryCodecPayloadTypes: [ 8, 96, 100 ]
+	// mandatoryCodecPayloadTypes: [ 97 ]
 };
 
 exports.JOIN_ROOM_RESPONSE =
