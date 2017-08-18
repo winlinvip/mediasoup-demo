@@ -139,6 +139,17 @@ exports.ROOM_RTP_CAPABILITIES =
 				'packetization-mode': 1,
 				'profile-level-id': '42e01f'
 			}
+		},
+		{
+			name: 'rtx',
+			mimeType: 'video/rtx',
+			kind: 'video',
+			clockRate: 90000,
+			preferredPayloadType: 112,
+			rtcpFeedback: [],
+			parameters: {
+				apt: 111
+			}
 		}
 	],
 	headerExtensions: [
@@ -488,10 +499,11 @@ exports.BOB_WEBCAM_NEW_CONSUMER_NOTIFICATION =
 		codecs:
 		[
 			{
-				name: 'VP8',
-				mimeType: 'video/VP8',
+				name: 'H264',
+				mimeType: 'video/H264',
+				kind: 'video',
 				clockRate: 90000,
-				payloadType: 100,
+				payloadType: 111,
 				rtcpFeedback:
 				[
 					{
@@ -511,16 +523,22 @@ exports.BOB_WEBCAM_NEW_CONSUMER_NOTIFICATION =
 						type: 'foo'
 					}
 				],
-				parameters: {}
+				parameters:
+				{
+					'level-asymmetry-allowed': 1,
+					'packetization-mode': 1,
+					'profile-level-id': '42e01f'
+				}
 			},
 			{
 				name: 'rtx',
 				mimeType: 'video/rtx',
+				kind: 'video',
 				clockRate: 90000,
-				payloadType: 101,
+				payloadType: 112,
 				rtcpFeedback: [],
 				parameters: {
-					apt: 100
+					apt: 111
 				}
 			}
 		],

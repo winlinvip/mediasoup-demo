@@ -29,6 +29,8 @@ const logger = new Logger();
 
 const reduxMiddlewares = [];
 
+reduxMiddlewares.push(thunk);
+
 if (process.env.NODE_ENV === 'development')
 {
 	const fluxLogger = createReduxLogger(
@@ -42,7 +44,6 @@ if (process.env.NODE_ENV === 'development')
 	reduxMiddlewares.push(fluxLogger);
 }
 
-reduxMiddlewares.push(thunk);
 reduxMiddlewares.push(roomClientMiddleware);
 
 const store = createFluxStore(
