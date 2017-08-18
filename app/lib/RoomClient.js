@@ -26,7 +26,7 @@ const VIDEO_CONSTRAINS =
 
 export default class RoomClient
 {
-	constructor({ roomId, peerName, displayName, device, dispatch })
+	constructor({ roomId, peerName, displayName, device, dispatch, getState })
 	{
 		logger.debug(
 			'constructor() [peerName:"%s", roomId:"%s"]', peerName, roomId);
@@ -39,6 +39,9 @@ export default class RoomClient
 
 		// Flux store dispatch function.
 		this._dispatch = dispatch;
+
+		// Flux store state getter.
+		this._getState = getState;
 
 		// protoo-client Peer instance.
 		this._protoo = new protooClient.Peer(protooTransport);
@@ -431,6 +434,13 @@ export default class RoomClient
 			.then(() =>
 			{
 				this._dispatch(actionCreators.setRoomState('connected'));
+
+				// Clean all the existing notifcations.
+				for (const notification of this._getState().notifications)
+				{
+					this._dispatch(
+						actionCreators.deleteNotification(notification.id));
+				}
 
 				this._dispatch(actionCreators.showNotification(
 					{

@@ -1,7 +1,7 @@
 import * as actionCreators from './actionCreators';
 import RoomClient from '../RoomClient';
 
-export default ({ dispatch }) => (next) =>
+export default ({ dispatch, getState }) => (next) =>
 {
 	let client;
 
@@ -14,7 +14,7 @@ export default ({ dispatch }) => (next) =>
 				const { roomId, peerName, displayName, device } = action.payload;
 
 				client = new RoomClient(
-					{ roomId, peerName, displayName, device, dispatch });
+					{ roomId, peerName, displayName, device, dispatch, getState });
 
 				// TODO: TMP
 				global.CLIENT = client;

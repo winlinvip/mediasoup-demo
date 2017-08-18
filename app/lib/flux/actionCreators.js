@@ -201,10 +201,10 @@ export const showNotification = ({ type = 'info', text, timeout }) =>
 		switch (type)
 		{
 			case 'info':
-				timeout = 2000;
+				timeout = 3000;
 				break;
 			case 'error':
-				timeout = 6000;
+				timeout = 5000;
 				break;
 		}
 	}
