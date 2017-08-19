@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { RIEInput } from 'riek';
 import * as appPropTypes from './appPropTypes';
 
-const PeerInfo = ({ isMe, peer, onSetDisplayName }) =>
+const PeerInfo = ({ isMe, peer, onChangeDisplayName }) =>
 {
 	return (
 		<div
@@ -13,7 +13,7 @@ const PeerInfo = ({ isMe, peer, onSetDisplayName }) =>
 		>
 			{isMe ?
 				<RIEInput
-					value={peer.displayName || 'Edit Your Name'}
+					value={peer.displayName}
 					propName='displayName'
 					className='display-name editable'
 					classLoading='loading'
@@ -25,7 +25,7 @@ const PeerInfo = ({ isMe, peer, onSetDisplayName }) =>
 						spellCheck  : false
 					}}
 					validate={(string) => string.length >= 3}
-					change={({ displayName }) => onSetDisplayName(displayName)}
+					change={({ displayName }) => onChangeDisplayName(displayName)}
 				/>
 				:
 				<span className='display-name'>
@@ -53,7 +53,7 @@ PeerInfo.propTypes =
 	isMe : PropTypes.bool,
 	peer : PropTypes.oneOfType(
 		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
-	onSetDisplayName : PropTypes.func
+	onChangeDisplayName : PropTypes.func
 };
 
 export default PeerInfo;

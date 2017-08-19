@@ -63,7 +63,7 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		onRoomLinkCopy : () =>
 		{
-			dispatch(requestActions.showNotification(
+			dispatch(requestActions.notify(
 				{
 					text : 'Room link copied to the clipboard'
 				}));

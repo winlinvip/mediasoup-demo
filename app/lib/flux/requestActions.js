@@ -59,7 +59,7 @@ export const changeWebcam = () =>
 	};
 };
 
-export const showNotification = ({ type = 'info', text, timeout }) =>
+export const notify = ({ type = 'info', text, timeout }) =>
 {
 	if (!timeout)
 	{

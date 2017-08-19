@@ -14,7 +14,7 @@ const Me = (props) =>
 		me,
 		micProducer,
 		webcamProducer,
-		onSetDisplayName,
+		onChangeDisplayName,
 		onMuteMic,
 		onUnmuteMic,
 		onRemoveWebcam,
@@ -90,7 +90,7 @@ const Me = (props) =>
 			<PeerInfo
 				isMe
 				peer={me}
-				onSetDisplayName={(displayName) => onSetDisplayName(displayName)}
+				onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
 			/>
 
 			<Stream
@@ -105,16 +105,16 @@ const Me = (props) =>
 
 Me.propTypes =
 {
-	connected        : PropTypes.bool.isRequired,
-	me               : appPropTypes.Me.isRequired,
-	micProducer      : appPropTypes.Producer,
-	webcamProducer   : appPropTypes.Producer,
-	onSetDisplayName : PropTypes.func.isRequired,
-	onMuteMic        : PropTypes.func.isRequired,
-	onUnmuteMic      : PropTypes.func.isRequired,
-	onRemoveWebcam   : PropTypes.func.isRequired,
-	onAddWebcam      : PropTypes.func.isRequired,
-	onChangeWebcam   : PropTypes.func.isRequired
+	connected           : PropTypes.bool.isRequired,
+	me                  : appPropTypes.Me.isRequired,
+	micProducer         : appPropTypes.Producer,
+	webcamProducer      : appPropTypes.Producer,
+	onChangeDisplayName : PropTypes.func.isRequired,
+	onMuteMic           : PropTypes.func.isRequired,
+	onUnmuteMic         : PropTypes.func.isRequired,
+	onRemoveWebcam      : PropTypes.func.isRequired,
+	onAddWebcam         : PropTypes.func.isRequired,
+	onChangeWebcam      : PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) =>
@@ -136,7 +136,7 @@ const mapStateToProps = (state) =>
 const mapDispatchToProps = (dispatch) =>
 {
 	return {
-		onSetDisplayName : (displayName) =>
+		onChangeDisplayName : (displayName) =>
 		{
 			dispatch(requestActions.changeDisplayName(displayName));
 		},

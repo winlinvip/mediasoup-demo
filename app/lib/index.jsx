@@ -89,11 +89,11 @@ function run()
 
 	// NOTE: I don't like this.
 	store.dispatch(
-		requestActions.joinRoom({ roomId, peerName, displayName, device }));
+		stateActions.setMe({ peerName, displayName, device }));
 
 	// NOTE: I don't like this.
 	store.dispatch(
-		stateActions.setMe({ peerName, displayName, device }));
+		requestActions.joinRoom({ roomId, peerName, displayName, device }));
 
 	render(
 		<Provider store={store}>

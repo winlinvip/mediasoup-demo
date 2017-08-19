@@ -4,6 +4,7 @@ global-reset();
 
 @import './mixins';
 @import './fonts';
+@import './reset';
 
 html {
 	height: 100%;
@@ -27,14 +28,11 @@ html {
 
 body {
 	height: 100%;
-	box-sizing: border-box;
-	background: none;
 }
 
 #mediasoup-demo-app-container {
 	height: 100%;
 	width: 100%;
-	box-sizing: border-box;
 
 	// Components
 	@import './components/Room';
@@ -44,11 +42,6 @@ body {
 	@import './components/Peer';
 	@import './components/Stream';
 	@import './components/Notifications';
-
-	* {
-		box-sizing: border-box;
-		outline: none;
-	}
 }
 
 // Hack to detect in JS the current media query

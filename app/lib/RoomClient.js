@@ -94,16 +94,6 @@ export default class RoomClient
 		this._dispatch(stateActions.setRoomState('closed'));
 	}
 
-	// getConsumerById(peerName, consumerId)
-	// {
-	// 	const peer = this._room.getPeerByName(peerName);
-
-	// 	if (!peer)
-	// 		return;
-
-	// 	return peer.getConsumerById(consumerId);
-	// }
-
 	changeDisplayName(displayName)
 	{
 		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
@@ -112,9 +102,29 @@ export default class RoomClient
 		cookiesManager.setUser({ displayName });
 
 		return this._protoo.send('change-display-name', { displayName })
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setDisplayName(displayName));
+
+				this._dispatch(requestActions.notify(
+					{
+						text : 'Display name changed'
+					}));
+			})
 			.catch((error) =>
 			{
 				logger.error('changeDisplayName() | failed: %o', error);
+
+				this._dispatch(requestActions.notify(
+					{
+						type : 'error',
+						text : `Could not change display name: ${error}`
+					}));
+
+				// We need to refresh the component for it to render the previous
+				// displayName again.
+				this._dispatch(stateActions.setDisplayName());
 			});
 	}
 
@@ -139,14 +149,23 @@ export default class RoomClient
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: false });
 
+		this._dispatch(
+			stateActions.setWebcamInProgress(true));
+
 		return Promise.resolve()
 			.then(() =>
 			{
 				this._webcamProducer.close();
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 			})
 			.catch((error) =>
 			{
 				logger.error('removeWebcam() | failed: %o', error);
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 			});
 	}
 
@@ -157,6 +176,9 @@ export default class RoomClient
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: true });
 
+		this._dispatch(
+			stateActions.setWebcamInProgress(true));
+
 		return Promise.resolve()
 			.then(() =>
 			{
@@ -166,15 +188,26 @@ export default class RoomClient
 			{
 				return this._setWebcamProducer();
 			})
+			.then(() =>
+			{
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
+			})
 			.catch((error) =>
 			{
 				logger.error('addWebcam() | failed: %o', error);
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 			});
 	}
 
 	changeWebcam()
 	{
 		logger.debug('changeWebcam()');
+
+		this._dispatch(
+			stateActions.setWebcamInProgress(true));
 
 		return Promise.resolve()
 			.then(() =>
@@ -229,10 +262,16 @@ export default class RoomClient
 			{
 				this._dispatch(
 					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 			})
 			.catch((error) =>
 			{
 				logger.error('changeWebcam() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 			});
 	}
 
@@ -242,6 +281,9 @@ export default class RoomClient
 
 		let oldResolution;
 		let newResolution;
+
+		this._dispatch(
+			stateActions.setWebcamInProgress(true));
 
 		return Promise.resolve()
 			.then(() =>
@@ -286,10 +328,16 @@ export default class RoomClient
 			{
 				this._dispatch(
 					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 			})
 			.catch((error) =>
 			{
 				logger.error('changeWebcamResolution() failed: %o', error);
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
 
 				this._webcam.resolution = oldResolution;
 			});
@@ -312,7 +360,7 @@ export default class RoomClient
 		{
 			logger.warn('protoo Peer "disconnected" event');
 
-			this._dispatch(requestActions.showNotification(
+			this._dispatch(requestActions.notify(
 				{
 					type : 'error',
 					text : 'WebSocket disconnected'
@@ -447,9 +495,10 @@ export default class RoomClient
 				// Clean all the existing notifcations.
 				this._dispatch(stateActions.removeAllNotifications());
 
-				this._dispatch(requestActions.showNotification(
+				this._dispatch(requestActions.notify(
 					{
-						text : 'You are in the room'
+						text    : 'You are in the room',
+						timeout : 5000
 					}));
 
 				const peers = this._room.peers;
@@ -463,7 +512,7 @@ export default class RoomClient
 			{
 				logger.error('_joinRoom() failed:%o', error);
 
-				this._dispatch(requestActions.showNotification(
+				this._dispatch(requestActions.notify(
 					{
 						type : 'error',
 						text : `Could not join the room: ${error.toString()}`
@@ -552,7 +601,7 @@ export default class RoomClient
 			{
 				logger.error('_setMicProducer() failed:%o', error);
 
-				this._dispatch(requestActions.showNotification(
+				this._dispatch(requestActions.notify(
 					{
 						text : `Mic producer failed: ${error.name}:${error.message}`
 					}));
@@ -660,7 +709,7 @@ export default class RoomClient
 			{
 				logger.error('_setWebcamProducer() failed:%o', error);
 
-				this._dispatch(requestActions.showNotification(
+				this._dispatch(requestActions.notify(
 					{
 						text : `Webcam producer failed: ${error.name}:${error.message}`
 					}));
@@ -743,7 +792,7 @@ export default class RoomClient
 
 		if (notify)
 		{
-			this._dispatch(requestActions.showNotification(
+			this._dispatch(requestActions.notify(
 				{
 					text : `${displayName} joined the room`
 				}));
@@ -764,7 +813,7 @@ export default class RoomClient
 
 			if (this._room.joined)
 			{
-				this._dispatch(requestActions.showNotification(
+				this._dispatch(requestActions.notify(
 					{
 						text : `${displayName} left the room`
 					}));

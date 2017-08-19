@@ -1,4 +1,3 @@
-import * as stateActions from './stateActions';
 import RoomClient from '../RoomClient';
 
 // eslint-disable-next-line no-unused-vars
@@ -34,8 +33,7 @@ export default ({ dispatch, getState }) => (next) =>
 			{
 				const { displayName } = action.payload;
 
-				client.changeDisplayName(displayName)
-					.then(() => dispatch(stateActions.setDisplayName(displayName)));
+				client.changeDisplayName(displayName);
 
 				break;
 			}
@@ -56,27 +54,21 @@ export default ({ dispatch, getState }) => (next) =>
 
 			case 'REMOVE_WEBCAM':
 			{
-				dispatch(stateActions.setWebcamInProgress(true));
-				client.removeWebcam()
-					.then(() => dispatch(stateActions.setWebcamInProgress(false)));
+				client.removeWebcam();
 
 				break;
 			}
 
 			case 'ADD_WEBCAM':
 			{
-				dispatch(stateActions.setWebcamInProgress(true));
-				client.addWebcam()
-					.then(() => dispatch(stateActions.setWebcamInProgress(false)));
+				client.addWebcam();
 
 				break;
 			}
 
 			case 'CHANGE_WEBCAM':
 			{
-				dispatch(stateActions.setWebcamInProgress(true));
-				client.changeWebcam()
-					.then(() => dispatch(stateActions.setWebcamInProgress(false)));
+				client.changeWebcam();
 
 				break;
 			}

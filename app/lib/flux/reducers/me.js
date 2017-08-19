@@ -43,7 +43,12 @@ const me = (state = initialState, action) =>
 
 		case 'SET_DISPLAY_NAME':
 		{
-			const { displayName } = action.payload;
+			// Be ready for undefined displayName (so keep previous one).
+			let { displayName } = action.payload;
+
+			// Be ready for undefined displayName (so keep previous one).
+			if (!displayName)
+				displayName = state.displayName;
 
 			return { ...state, displayName };
 		}

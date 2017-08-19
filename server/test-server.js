@@ -103,6 +103,7 @@ function handleProtooPeer(protooPeer)
 			case 'change-display-name':
 			{
 				setTimeout(accept, 2000);
+				// setTimeout(() => reject(500, 'Blablabla'), 2000);
 
 				break;
 			}
