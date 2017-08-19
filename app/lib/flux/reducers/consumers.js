@@ -4,14 +4,14 @@ const consumers = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'NEW_CONSUMER':
+		case 'ADD_CONSUMER':
 		{
 			const { consumer } = action.payload;
 
 			return { ...state, [consumer.id]: consumer };
 		}
 
-		case 'CONSUMER_CLOSED':
+		case 'REMOVE_CONSUMER':
 		{
 			const { consumerId } = action.payload;
 			const newState = { ...state };
@@ -21,7 +21,7 @@ const consumers = (state = initialState, action) =>
 			return newState;
 		}
 
-		case 'CONSUMER_PAUSED':
+		case 'SET_CONSUMER_PAUSED':
 		{
 			const { consumerId, originator } = action.payload;
 			const consumer = state[consumerId];
@@ -35,7 +35,7 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
-		case 'CONSUMER_RESUMED':
+		case 'SET_CONSUMER_RESUMED':
 		{
 			const { consumerId, originator } = action.payload;
 			const consumer = state[consumerId];
@@ -49,7 +49,7 @@ const consumers = (state = initialState, action) =>
 			return { ...state, [consumerId]: newConsumer };
 		}
 
-		case 'CONSUMER_GOT_TRACK':
+		case 'SET_CONSUMER_TRACK':
 		{
 			const { consumerId, track } = action.payload;
 			const consumer = state[consumerId];

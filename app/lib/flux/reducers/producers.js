@@ -4,14 +4,14 @@ const producers = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'NEW_PRODUCER':
+		case 'ADD_PRODUCER':
 		{
 			const { producer } = action.payload;
 
 			return { ...state, [producer.id]: producer };
 		}
 
-		case 'PRODUCER_CLOSED':
+		case 'REMOVE_PRODUCER':
 		{
 			const { producerId } = action.payload;
 			const newState = { ...state };
@@ -21,7 +21,7 @@ const producers = (state = initialState, action) =>
 			return newState;
 		}
 
-		case 'PRODUCER_PAUSED':
+		case 'SET_PRODUCER_PAUSED':
 		{
 			const { producerId, originator } = action.payload;
 			const producer = state[producerId];
@@ -35,7 +35,7 @@ const producers = (state = initialState, action) =>
 			return { ...state, [producerId]: newProducer };
 		}
 
-		case 'PRODUCER_RESUMED':
+		case 'SET_PRODUCER_RESUMED':
 		{
 			const { producerId, originator } = action.payload;
 			const producer = state[producerId];
@@ -49,7 +49,7 @@ const producers = (state = initialState, action) =>
 			return { ...state, [producerId]: newProducer };
 		}
 
-		case 'REPLACE_PRODUCER_TRACK':
+		case 'SET_PRODUCER_TRACK':
 		{
 			const { producerId, track } = action.payload;
 			const producer = state[producerId];

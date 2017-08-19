@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
-import * as actionCreators from '../flux/actionCreators';
+import * as requestActions from '../flux/requestActions';
 import PeerInfo from './PeerInfo';
 import Stream from './Stream';
 
@@ -138,13 +138,13 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		onSetDisplayName : (displayName) =>
 		{
-			dispatch(actionCreators.setDisplayName(displayName));
+			dispatch(requestActions.changeDisplayName(displayName));
 		},
-		onMuteMic      : () => dispatch(actionCreators.muteMic()),
-		onUnmuteMic    : () => dispatch(actionCreators.unmuteMic()),
-		onRemoveWebcam : () => dispatch(actionCreators.removeWebcam()),
-		onAddWebcam    : () => dispatch(actionCreators.addWebcam()),
-		onChangeWebcam : () => dispatch(actionCreators.changeWebcam())
+		onMuteMic      : () => dispatch(requestActions.muteMic()),
+		onUnmuteMic    : () => dispatch(requestActions.unmuteMic()),
+		onRemoveWebcam : () => dispatch(requestActions.removeWebcam()),
+		onAddWebcam    : () => dispatch(requestActions.addWebcam()),
+		onChangeWebcam : () => dispatch(requestActions.changeWebcam())
 	};
 };
 

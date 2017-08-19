@@ -4,7 +4,6 @@
 {
   room :
   {
-    id    : 'wqetr6yqe',
     state : 'connected' // new/connecting/connected/closed
   },
   me :

@@ -13,7 +13,7 @@ const me = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'JOIN_ROOM':
+		case 'SET_ME':
 		{
 			const { peerName, displayName, device } = action.payload;
 

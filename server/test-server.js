@@ -100,7 +100,7 @@ function handleProtooPeer(protooPeer)
 				break;
 			}
 
-			case 'set-display-name':
+			case 'change-display-name':
 			{
 				setTimeout(accept, 2000);
 

@@ -1,6 +1,7 @@
-import * as actionCreators from './actionCreators';
+import * as stateActions from './stateActions';
 import RoomClient from '../RoomClient';
 
+// eslint-disable-next-line no-unused-vars
 export default ({ dispatch, getState }) => (next) =>
 {
 	let client;
@@ -14,7 +15,7 @@ export default ({ dispatch, getState }) => (next) =>
 				const { roomId, peerName, displayName, device } = action.payload;
 
 				client = new RoomClient(
-					{ roomId, peerName, displayName, device, dispatch, getState });
+					{ roomId, peerName, displayName, device, dispatch });
 
 				// TODO: TMP
 				global.CLIENT = client;
@@ -29,11 +30,12 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
-			case 'SET_DISPLAY_NAME':
+			case 'CHANGE_DISPLAY_NAME':
 			{
 				const { displayName } = action.payload;
 
-				client.setDisplayName(displayName);
+				client.changeDisplayName(displayName)
+					.then(() => dispatch(stateActions.setDisplayName(displayName)));
 
 				break;
 			}
@@ -54,27 +56,27 @@ export default ({ dispatch, getState }) => (next) =>
 
 			case 'REMOVE_WEBCAM':
 			{
-				dispatch(actionCreators.setWebcamInProgress(true));
+				dispatch(stateActions.setWebcamInProgress(true));
 				client.removeWebcam()
-					.then(() => dispatch(actionCreators.setWebcamInProgress(false)));
+					.then(() => dispatch(stateActions.setWebcamInProgress(false)));
 
 				break;
 			}
 
 			case 'ADD_WEBCAM':
 			{
-				dispatch(actionCreators.setWebcamInProgress(true));
+				dispatch(stateActions.setWebcamInProgress(true));
 				client.addWebcam()
-					.then(() => dispatch(actionCreators.setWebcamInProgress(false)));
+					.then(() => dispatch(stateActions.setWebcamInProgress(false)));
 
 				break;
 			}
 
 			case 'CHANGE_WEBCAM':
 			{
-				dispatch(actionCreators.setWebcamInProgress(true));
+				dispatch(stateActions.setWebcamInProgress(true));
 				client.changeWebcam()
-					.then(() => dispatch(actionCreators.setWebcamInProgress(false)));
+					.then(() => dispatch(stateActions.setWebcamInProgress(false)));
 
 				break;
 			}

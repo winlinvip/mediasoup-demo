@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
-import * as actionCreators from '../flux/actionCreators';
+import * as stateActions from '../flux/stateActions';
 import { FadeIn } from './transitions';
 
 const Notifications = ({ notifications, onClick }) =>
@@ -48,7 +48,7 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		onClick : (notificationId) =>
 		{
-			dispatch(actionCreators.deleteNotification(notificationId));
+			dispatch(stateActions.removeNotification(notificationId));
 		}
 	};
 };

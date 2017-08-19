@@ -16,17 +16,15 @@ import randomName from 'node-random-name';
 import Logger from './Logger';
 import * as utils from './utils';
 import * as cookiesManager from './cookiesManager';
-import * as actionCreators from './flux/actionCreators';
+import * as requestActions from './flux/requestActions';
+import * as stateActions from './flux/stateActions';
 import reducers from './flux/reducers';
 import roomClientMiddleware from './flux/roomClientMiddleware';
 import Room from './components/Room';
 
-injectTapEventPlugin();
-
 const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#roomId=([0-9a-zA-Z_-]+)$');
 
 const logger = new Logger();
-
 const reduxMiddlewares = [];
 
 reduxMiddlewares.push(thunk);
@@ -51,6 +49,8 @@ const store = createFluxStore(
 	undefined,
 	applyFluxMiddleware(...reduxMiddlewares)
 );
+
+injectTapEventPlugin();
 
 domready(() =>
 {
@@ -83,10 +83,17 @@ function run()
 	// Get displayName from cookie.
 	const userCookie = cookiesManager.getUser() || {};
 	const displayName = userCookie.displayName || randomName();
+
+	// Get current device.
 	const device = getDeviceInfo();
 
+	// NOTE: I don't like this.
 	store.dispatch(
-		actionCreators.joinRoom({ roomId, peerName, displayName, device }));
+		requestActions.joinRoom({ roomId, peerName, displayName, device }));
+
+	// NOTE: I don't like this.
+	store.dispatch(
+		stateActions.setMe({ peerName, displayName, device }));
 
 	render(
 		<Provider store={store}>
@@ -95,40 +102,3 @@ function run()
 		document.getElementById('mediasoup-demo-app-container')
 	);
 }
-
-// TODO: TMP
-global.STORE = store;
-global.ACTION_CREATORS = actionCreators;
-
-// TODO: Test notifications
-
-// global.TEST_NOTIFICATIONS = () =>
-// {
-// 	store.dispatch(actionCreators.showNotification(
-// 		{
-// 			type : 'info',
-// 			text : 'Info notification 1'
-// 		}));
-
-// 	setTimeout(() =>
-// 	{
-// 		store.dispatch(actionCreators.showNotification(
-// 			{
-// 				type : 'error',
-// 				text : 'Errror !!! something errible happened'
-// 			}));
-// 	}, 1000);
-
-// 	setTimeout(() =>
-// 	{
-// 		store.dispatch(actionCreators.showNotification(
-// 			{
-// 				type    : 'info',
-// 				text    : 'Info notification 2 Info notification 2 Info notification 2 Info notification 2',
-// 				timeout : 4000
-// 			}));
-// 	}, 2000);
-// };
-
-// global.TEST_NOTIFICATIONS();
-// setInterval(global.TEST_NOTIFICATIONS, 5000);

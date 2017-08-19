@@ -1,4 +1,6 @@
 # TODO
 
-* Instead of using `roomClientMiddleware.js` as a middleware in flux, use `flux-thunk` by passing the `roomClient` as argument:
-https://github.com/gaearon/redux-thunk#injecting-a-custom-argument
+* Migrate from nib to autoprefixer:
+https://github.com/postcss/autoprefixer
+https://github.com/jescalan/autoprefixer-stylus
+https://gist.github.com/ayapi/26d299e4a61d9ac66036

@@ -3,7 +3,8 @@ import * as mediasoupClient from 'mediasoup-client';
 import Logger from './Logger';
 import { getProtooUrl } from './urlFactory';
 import * as cookiesManager from './cookiesManager';
-import * as actionCreators from './flux/actionCreators';
+import * as requestActions from './flux/requestActions';
+import * as stateActions from './flux/stateActions';
 
 const logger = new Logger('RoomClient');
 
@@ -26,7 +27,7 @@ const VIDEO_CONSTRAINS =
 
 export default class RoomClient
 {
-	constructor({ roomId, peerName, displayName, device, dispatch, getState })
+	constructor({ roomId, peerName, displayName, device, dispatch })
 	{
 		logger.debug(
 			'constructor() [peerName:"%s", roomId:"%s"]', peerName, roomId);
@@ -39,9 +40,6 @@ export default class RoomClient
 
 		// Flux store dispatch function.
 		this._dispatch = dispatch;
-
-		// Flux store state getter.
-		this._getState = getState;
 
 		// protoo-client Peer instance.
 		this._protoo = new protooClient.Peer(protooTransport);
@@ -93,7 +91,7 @@ export default class RoomClient
 		// the 'leaveRoom' notification).
 		setTimeout(() => this._protoo.close(), 250);
 
-		this._dispatch(actionCreators.setRoomState('closed'));
+		this._dispatch(stateActions.setRoomState('closed'));
 	}
 
 	// getConsumerById(peerName, consumerId)
@@ -106,17 +104,17 @@ export default class RoomClient
 	// 	return peer.getConsumerById(consumerId);
 	// }
 
-	setDisplayName(displayName)
+	changeDisplayName(displayName)
 	{
-		logger.debug('setDisplayName() [displayName:"%s"]', displayName);
+		logger.debug('changeDisplayName() [displayName:"%s"]', displayName);
 
 		// Store in cookie.
 		cookiesManager.setUser({ displayName });
 
-		this._protoo.send('set-display-name', { displayName })
+		return this._protoo.send('change-display-name', { displayName })
 			.catch((error) =>
 			{
-				logger.error('setDisplayName() | failed: %o', error);
+				logger.error('changeDisplayName() | failed: %o', error);
 			});
 	}
 
@@ -230,7 +228,7 @@ export default class RoomClient
 			.then((newTrack) =>
 			{
 				this._dispatch(
-					actionCreators.replaceProducerTrack(this._webcamProducer.id, newTrack));
+					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
 			})
 			.catch((error) =>
 			{
@@ -289,7 +287,7 @@ export default class RoomClient
 			.then((newTrack) =>
 			{
 				this._dispatch(
-					actionCreators.replaceProducerTrack(this._webcamProducer.id, newTrack));
+					stateActions.setProducerTrack(this._webcamProducer.id, newTrack));
 			})
 			.catch((error) =>
 			{
@@ -301,7 +299,7 @@ export default class RoomClient
 
 	_join({ displayName, device })
 	{
-		this._dispatch(actionCreators.setRoomState('connecting'));
+		this._dispatch(stateActions.setRoomState('connecting'));
 
 		const protoo = this._protoo;
 
@@ -316,7 +314,7 @@ export default class RoomClient
 		{
 			logger.warn('protoo Peer "disconnected" event');
 
-			this._dispatch(actionCreators.showNotification(
+			this._dispatch(requestActions.showNotification(
 				{
 					type : 'error',
 					text : 'WebSocket disconnected'
@@ -326,7 +324,7 @@ export default class RoomClient
 			try { this._room.remoteClose({ cause: 'protoo disconnected' }); }
 			catch (error) {}
 
-			this._dispatch(actionCreators.setRoomState('connecting'));
+			this._dispatch(stateActions.setRoomState('connecting'));
 		});
 
 		protoo.on('close', () =>
@@ -418,7 +416,7 @@ export default class RoomClient
 			.then(() =>
 			{
 				// Set our media capabilities.
-				this._dispatch(actionCreators.setMediaCapabilities(
+				this._dispatch(stateActions.setMediaCapabilities(
 					{
 						canSendMic    : this._room.canSend('audio'),
 						canSendWebcam : this._room.canSend('video')
@@ -446,16 +444,12 @@ export default class RoomClient
 			})
 			.then(() =>
 			{
-				this._dispatch(actionCreators.setRoomState('connected'));
+				this._dispatch(stateActions.setRoomState('connected'));
 
 				// Clean all the existing notifcations.
-				for (const notification of this._getState().notifications)
-				{
-					this._dispatch(
-						actionCreators.deleteNotification(notification.id));
-				}
+				this._dispatch(stateActions.removeAllNotifications());
 
-				this._dispatch(actionCreators.showNotification(
+				this._dispatch(requestActions.showNotification(
 					{
 						text : 'You are in the room'
 					}));
@@ -471,7 +465,7 @@ export default class RoomClient
 			{
 				logger.error('_joinRoom() failed:%o', error);
 
-				this._dispatch(actionCreators.showNotification(
+				this._dispatch(requestActions.showNotification(
 					{
 						type : 'error',
 						text : `Could not join the room: ${error.toString()}`
@@ -518,7 +512,7 @@ export default class RoomClient
 			{
 				this._micProducer = producer;
 
-				this._dispatch(actionCreators.newProducer(
+				this._dispatch(stateActions.addProducer(
 					{
 						id             : producer.id,
 						source         : 'mic',
@@ -533,7 +527,7 @@ export default class RoomClient
 						'mic Producer "closed" event [originator:%s]', originator);
 
 					this._micProducer = null;
-					this._dispatch(actionCreators.producerClosed(producer.id));
+					this._dispatch(stateActions.removeProducer(producer.id));
 				});
 
 				producer.on('paused', (originator) =>
@@ -541,7 +535,7 @@ export default class RoomClient
 					logger.debug(
 						'mic Producer "paused" event [originator:%s]', originator);
 
-					this._dispatch(actionCreators.producerPaused(producer.id, originator));
+					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
 				});
 
 				producer.on('resumed', (originator) =>
@@ -549,7 +543,7 @@ export default class RoomClient
 					logger.debug(
 						'mic Producer "resumed" event [originator:%s]', originator);
 
-					this._dispatch(actionCreators.producerResumed(producer.id, originator));
+					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
 				});
 			})
 			.then(() =>
@@ -559,6 +553,11 @@ export default class RoomClient
 			.catch((error) =>
 			{
 				logger.error('_setMicProducer() failed:%o', error);
+
+				this._dispatch(requestActions.showNotification(
+					{
+						text : `Mic producer failed: ${error.name}:${error.message}`
+					}));
 
 				if (producer)
 					producer.close();
@@ -618,7 +617,7 @@ export default class RoomClient
 
 				const { device, resolution } = this._webcam;
 
-				this._dispatch(actionCreators.newProducer(
+				this._dispatch(stateActions.addProducer(
 					{
 						id             : producer.id,
 						source         : 'webcam',
@@ -636,7 +635,7 @@ export default class RoomClient
 						'webcam Producer "closed" event [originator:%s]', originator);
 
 					this._webcamProducer = null;
-					this._dispatch(actionCreators.producerClosed(producer.id));
+					this._dispatch(stateActions.removeProducer(producer.id));
 				});
 
 				producer.on('paused', (originator) =>
@@ -644,7 +643,7 @@ export default class RoomClient
 					logger.debug(
 						'webcam Producer "paused" event [originator:%s]', originator);
 
-					this._dispatch(actionCreators.producerPaused(producer.id, originator));
+					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
 				});
 
 				producer.on('resumed', (originator) =>
@@ -652,7 +651,7 @@ export default class RoomClient
 					logger.debug(
 						'webcam Producer "resumed" event [originator:%s]', originator);
 
-					this._dispatch(actionCreators.producerResumed(producer.id, originator));
+					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
 				});
 			})
 			.then(() =>
@@ -662,6 +661,11 @@ export default class RoomClient
 			.catch((error) =>
 			{
 				logger.error('_setWebcamProducer() failed:%o', error);
+
+				this._dispatch(requestActions.showNotification(
+					{
+						text : `Webcam producer failed: ${error.name}:${error.message}`
+					}));
 
 				if (producer)
 					producer.close();
@@ -707,7 +711,7 @@ export default class RoomClient
 					this._webcam.device = array[0];
 
 				this._dispatch(
-					actionCreators.setCanChangeWebcam(this._webcams.size >= 2));
+					stateActions.setCanChangeWebcam(this._webcams.size >= 2));
 			});
 	}
 
@@ -731,7 +735,7 @@ export default class RoomClient
 	{
 		const displayName = peer.appData.displayName;
 
-		this._dispatch(actionCreators.newPeer(
+		this._dispatch(stateActions.addPeer(
 			{
 				name        : peer.name,
 				displayName : displayName,
@@ -741,7 +745,7 @@ export default class RoomClient
 
 		if (notify)
 		{
-			this._dispatch(actionCreators.showNotification(
+			this._dispatch(requestActions.showNotification(
 				{
 					text : `${displayName} joined the room`
 				}));
@@ -758,11 +762,11 @@ export default class RoomClient
 				'peer "closed" event [name:"%s", originator:%s]',
 				peer.name, originator);
 
-			this._dispatch(actionCreators.peerClosed(peer.name));
+			this._dispatch(stateActions.removePeer(peer.name));
 
 			if (this._room.joined)
 			{
-				this._dispatch(actionCreators.showNotification(
+				this._dispatch(requestActions.showNotification(
 					{
 						text : `${displayName} left the room`
 					}));
@@ -781,7 +785,7 @@ export default class RoomClient
 
 	_handleConsumer(consumer)
 	{
-		this._dispatch(actionCreators.newConsumer(
+		this._dispatch(stateActions.addConsumer(
 			{
 				id             : consumer.id,
 				peerName       : consumer.peer.name,
@@ -798,7 +802,7 @@ export default class RoomClient
 				'consumer "closed" event [id:%s, originator:%s, consumer:%o]',
 				consumer.id, originator, consumer);
 
-			this._dispatch(actionCreators.consumerClosed(
+			this._dispatch(stateActions.removeConsumer(
 				consumer.id, consumer.peer.name));
 		});
 
@@ -808,7 +812,7 @@ export default class RoomClient
 				'consumer "paused" event [id:%s, originator:%s, consumer:%o]',
 				consumer.id, originator, consumer);
 
-			this._dispatch(actionCreators.consumerPaused(consumer.id, originator));
+			this._dispatch(stateActions.setConsumerPaused(consumer.id, originator));
 		});
 
 		consumer.on('resumed', (originator) =>
@@ -817,7 +821,7 @@ export default class RoomClient
 				'consumer "resumed" event [id:%s, originator:%s, consumer:%o]',
 				consumer.id, originator, consumer);
 
-			this._dispatch(actionCreators.consumerResumed(consumer.id, originator));
+			this._dispatch(stateActions.setConsumerResumed(consumer.id, originator));
 		});
 
 		// Receive the consumer (if we can).
@@ -826,7 +830,7 @@ export default class RoomClient
 			this._recvTransport.receive(consumer)
 				.then((track) =>
 				{
-					this._dispatch(actionCreators.consumerGotTrack(consumer.id, track));
+					this._dispatch(stateActions.setConsumerTrack(consumer.id, track));
 				})
 				.catch((error) =>
 				{

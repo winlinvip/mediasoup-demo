@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import ClipboardButton from 'react-clipboard.js';
 import * as appPropTypes from './appPropTypes';
-import * as actionCreators from '../flux/actionCreators';
+import * as requestActions from '../flux/requestActions';
 import { FadeIn } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
@@ -63,7 +63,7 @@ const mapDispatchToProps = (dispatch) =>
 	return {
 		onRoomLinkCopy : () =>
 		{
-			dispatch(actionCreators.showNotification(
+			dispatch(requestActions.showNotification(
 				{
 					text : 'Room link copied to the clipboard'
 				}));

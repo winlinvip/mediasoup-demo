@@ -4,14 +4,14 @@ const peers = (state = initialState, action) =>
 {
 	switch (action.type)
 	{
-		case 'NEW_PEER':
+		case 'ADD_PEER':
 		{
 			const { peer } = action.payload;
 
 			return { ...state, [peer.name]: peer };
 		}
 
-		case 'PEER_CLOSED':
+		case 'REMOVE_PEER':
 		{
 			const { peerName } = action.payload;
 			const newState = { ...state };
@@ -21,7 +21,7 @@ const peers = (state = initialState, action) =>
 			return newState;
 		}
 
-		case 'NEW_CONSUMER':
+		case 'ADD_CONSUMER':
 		{
 			const { consumer } = action.payload;
 			const { peerName } = consumer;
@@ -36,7 +36,7 @@ const peers = (state = initialState, action) =>
 			return { ...state, [newPeer.name]: newPeer };
 		}
 
-		case 'CONSUMER_CLOSED':
+		case 'REMOVE_CONSUMER':
 		{
 			const { consumerId, peerName } = action.payload;
 			const peer = state[peerName];

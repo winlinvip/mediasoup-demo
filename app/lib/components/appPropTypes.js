@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 
 export const Room = PropTypes.shape(
 	{
-		id    : PropTypes.string.isRequired,
 		state : PropTypes.oneOf(
 			[
 				'new',
