@@ -11,7 +11,9 @@ export default class Stream extends React.Component
 
 		this.state =
 		{
-			volume : 0 // Integer from 0 to 10.
+			volume      : 0, // Integer from 0 to 10.,
+			videoWidth  : null,
+			videoHeight : null
 		};
 
 		// Latest received video track.
@@ -25,12 +27,15 @@ export default class Stream extends React.Component
 		// Hark instance.
 		// @type {Object}
 		this._hark = null;
+
+		// Periodic timer for showing video resolution.
+		this._videoResolutionTimer = null;
 	}
 
 	render()
 	{
 		const { visible, isMe } = this.props;
-		const { volume } = this.state;
+		const { volume, videoWidth, videoHeight } = this.state;
 
 		return (
 			<div data-component='Stream'>
@@ -40,6 +45,14 @@ export default class Stream extends React.Component
 					autoPlay
 					muted={isMe}
 				/>
+
+				{(visible && videoWidth !== null) ?
+					<div className={classnames('resolution', { 'is-me': isMe })}>
+						<p>{videoWidth}x{videoHeight}</p>
+					</div>
+					:null
+				}
+
 
 				<div className='volume'>
 					<div className={classnames('bar', `level${volume}`)} />
@@ -59,6 +72,8 @@ export default class Stream extends React.Component
 	{
 		if (this._hark)
 			this._hark.stop();
+
+		clearInterval(this._videoResolutionTimer);
 	}
 
 	componentWillReceiveProps(nextProps)
@@ -79,6 +94,9 @@ export default class Stream extends React.Component
 		if (this._hark)
 			this._hark.stop();
 
+		clearInterval(this._videoResolutionTimer);
+		this._hideVideoResolution();
+
 		const { video } = this.refs;
 
 		if (audioTrack || videoTrack)
@@ -94,7 +112,10 @@ export default class Stream extends React.Component
 			video.srcObject = stream;
 
 			if (audioTrack)
-				this._setHark(stream);
+				this._runHark(stream);
+
+			if (videoTrack)
+				this._showVideoResolution();
 		}
 		else
 		{
@@ -102,10 +123,10 @@ export default class Stream extends React.Component
 		}
 	}
 
-	_setHark(stream)
+	_runHark(stream)
 	{
 		if (!stream.getAudioTracks()[0])
-			throw new Error('_setHark() | given stream has no audio track');
+			throw new Error('_runHark() | given stream has no audio track');
 
 		this._hark = hark(stream);
 
@@ -125,6 +146,25 @@ export default class Stream extends React.Component
 			if (volume !== this.state.volume)
 				this.setState({ volume: volume });
 		});
+	}
+
+	_showVideoResolution()
+	{
+		this._videoResolutionTimer = setInterval(() =>
+		{
+			const { video } = this.refs;
+
+			this.setState(
+				{
+					videoWidth  : video.videoWidth,
+					videoHeight : video.videoHeight
+				});
+		}, 1000);
+	}
+
+	_hideVideoResolution()
+	{
+		this.setState({ videoWidth: null, videoHeight: null });
 	}
 }
 

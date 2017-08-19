@@ -33,6 +33,42 @@
 		}
 	}
 
+	> .resolution {
+		position: absolute;
+
+		+desktop() {
+			top: 4px
+			left: 4px;
+		}
+
+		+mobile() {
+			&.is-me {
+				top: 4px
+				left: 4px;
+			}
+
+			&:not(.is-me) {
+				top: 4px
+				left: 0;
+				right: 0;
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				// align-items: center;
+			}
+		}
+
+		> p {
+			user-select: none;
+			pointer-events: none;
+			padding: 1px 1px;
+			border-radius: 2px;
+			background-color: rgba(#000, 0.25);
+			font-size: 11px;
+			color: rgba(#fff, 0.75);
+		}
+	}
+
 	> .volume {
 		position: absolute;
 		top: 0

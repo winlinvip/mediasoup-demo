@@ -125,15 +125,6 @@ function handleProtooPeer(protooPeer)
 
 		protooPeer.send(
 			'mediasoup-notification', DATA.BOB_NEW_PEER_NOTIFICATION);
-	}, 2000);
-
-	setTimeout(() =>
-	{
-		if (protooPeer.closed)
-			return;
-
-		protooPeer.send(
-			'mediasoup-notification', DATA.BOB_WEBCAM_NEW_CONSUMER_NOTIFICATION);
 	}, 4000);
 
 	setTimeout(() =>
@@ -142,8 +133,17 @@ function handleProtooPeer(protooPeer)
 			return;
 
 		protooPeer.send(
-			'mediasoup-notification', DATA.BOB_MIC_CONSUMER_PAUSED_NOTIFICATION);
+			'mediasoup-notification', DATA.BOB_WEBCAM_NEW_CONSUMER_NOTIFICATION);
 	}, 6000);
+
+	setTimeout(() =>
+	{
+		if (protooPeer.closed)
+			return;
+
+		protooPeer.send(
+			'mediasoup-notification', DATA.BOB_MIC_CONSUMER_PAUSED_NOTIFICATION);
+	}, 7000);
 
 	setTimeout(() =>
 	{
@@ -161,7 +161,7 @@ function handleProtooPeer(protooPeer)
 
 		protooPeer.send(
 			'mediasoup-notification', DATA.ALICE_WEBCAM_CONSUMER_RESUMED_NOTIFICATION);
-	}, 10000);
+	}, 9000);
 }
 
 function handleMediasoupClientRequest(request, accept, reject)

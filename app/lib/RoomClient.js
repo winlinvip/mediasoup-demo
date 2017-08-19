@@ -259,8 +259,6 @@ export default class RoomClient
 					case 'hd':
 						newResolution = 'qvga';
 						break;
-					default:
-						throw new Error(`unknown resolution "${this._webcam.resolution}"`);
 				}
 
 				this._webcam.resolution = newResolution;

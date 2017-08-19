@@ -15,7 +15,7 @@ const PeerInfo = ({ isMe, peer, onSetDisplayName }) =>
 				<RIEInput
 					value={peer.displayName || 'Edit Your Name'}
 					propName='displayName'
-					className='displayName editable'
+					className='display-name editable'
 					classLoading='loading'
 					classInvalid='invalid'
 					shouldBlockWhileLoading
@@ -28,7 +28,7 @@ const PeerInfo = ({ isMe, peer, onSetDisplayName }) =>
 					change={({ displayName }) => onSetDisplayName(displayName)}
 				/>
 				:
-				<span className='displayName'>
+				<span className='display-name'>
 					{peer.displayName}
 				</span>
 			}
