@@ -52,16 +52,16 @@ export default ({ dispatch, getState }) => (next) =>
 				break;
 			}
 
-			case 'REMOVE_WEBCAM':
+			case 'ENABLE_WEBCAM':
 			{
-				client.removeWebcam();
+				client.enableWebcam();
 
 				break;
 			}
 
-			case 'ADD_WEBCAM':
+			case 'DISABLE_WEBCAM':
 			{
-				client.addWebcam();
+				client.disableWebcam();
 
 				break;
 			}

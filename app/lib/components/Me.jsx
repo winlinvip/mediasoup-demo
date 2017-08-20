@@ -28,8 +28,8 @@ class Me extends React.Component
 			onChangeDisplayName,
 			onMuteMic,
 			onUnmuteMic,
-			onRemoveWebcam,
-			onAddWebcam,
+			onEnableWebcam,
+			onDisableWebcam,
 			onChangeWebcam
 		} = this.props;
 
@@ -95,7 +95,7 @@ class Me extends React.Component
 							})}
 							onClick={() =>
 							{
-								webcamState === 'on' ? onRemoveWebcam() : onAddWebcam();
+								webcamState === 'on' ? onDisableWebcam() : onEnableWebcam();
 							}}
 						/>
 
@@ -165,8 +165,8 @@ Me.propTypes =
 	onChangeDisplayName : PropTypes.func.isRequired,
 	onMuteMic           : PropTypes.func.isRequired,
 	onUnmuteMic         : PropTypes.func.isRequired,
-	onRemoveWebcam      : PropTypes.func.isRequired,
-	onAddWebcam         : PropTypes.func.isRequired,
+	onEnableWebcam      : PropTypes.func.isRequired,
+	onDisableWebcam     : PropTypes.func.isRequired,
 	onChangeWebcam      : PropTypes.func.isRequired
 };
 
@@ -193,11 +193,11 @@ const mapDispatchToProps = (dispatch) =>
 		{
 			dispatch(requestActions.changeDisplayName(displayName));
 		},
-		onMuteMic      : () => dispatch(requestActions.muteMic()),
-		onUnmuteMic    : () => dispatch(requestActions.unmuteMic()),
-		onRemoveWebcam : () => dispatch(requestActions.removeWebcam()),
-		onAddWebcam    : () => dispatch(requestActions.addWebcam()),
-		onChangeWebcam : () => dispatch(requestActions.changeWebcam())
+		onMuteMic       : () => dispatch(requestActions.muteMic()),
+		onUnmuteMic     : () => dispatch(requestActions.unmuteMic()),
+		onEnableWebcam  : () => dispatch(requestActions.enableWebcam()),
+		onDisableWebcam : () => dispatch(requestActions.disableWebcam()),
+		onChangeWebcam  : () => dispatch(requestActions.changeWebcam())
 	};
 };
 

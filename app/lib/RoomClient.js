@@ -142,36 +142,9 @@ export default class RoomClient
 		this._micProducer.resume();
 	}
 
-	removeWebcam()
+	enableWebcam()
 	{
-		logger.debug('removeWebcam()');
-
-		// Store in cookie.
-		cookiesManager.setDevices({ webcamEnabled: false });
-
-		this._dispatch(
-			stateActions.setWebcamInProgress(true));
-
-		return Promise.resolve()
-			.then(() =>
-			{
-				this._webcamProducer.close();
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			})
-			.catch((error) =>
-			{
-				logger.error('removeWebcam() | failed: %o', error);
-
-				this._dispatch(
-					stateActions.setWebcamInProgress(false));
-			});
-	}
-
-	addWebcam()
-	{
-		logger.debug('addWebcam()');
+		logger.debug('enableWebcam()');
 
 		// Store in cookie.
 		cookiesManager.setDevices({ webcamEnabled: true });
@@ -195,7 +168,34 @@ export default class RoomClient
 			})
 			.catch((error) =>
 			{
-				logger.error('addWebcam() | failed: %o', error);
+				logger.error('enableWebcam() | failed: %o', error);
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
+			});
+	}
+
+	disableWebcam()
+	{
+		logger.debug('disableWebcam()');
+
+		// Store in cookie.
+		cookiesManager.setDevices({ webcamEnabled: false });
+
+		this._dispatch(
+			stateActions.setWebcamInProgress(true));
+
+		return Promise.resolve()
+			.then(() =>
+			{
+				this._webcamProducer.close();
+
+				this._dispatch(
+					stateActions.setWebcamInProgress(false));
+			})
+			.catch((error) =>
+			{
+				logger.error('disableWebcam() | failed: %o', error);
 
 				this._dispatch(
 					stateActions.setWebcamInProgress(false));
@@ -485,7 +485,7 @@ export default class RoomClient
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						this.addWebcam();
+						this.enableWebcam();
 				}
 			})
 			.then(() =>

@@ -38,17 +38,17 @@ export const unmuteMic = () =>
 	};
 };
 
-export const removeWebcam = () =>
+export const enableWebcam = () =>
 {
 	return {
-		type : 'REMOVE_WEBCAM'
+		type : 'DISABLE_WEBCAM'
 	};
 };
 
-export const addWebcam = () =>
+export const disableWebcam = () =>
 {
 	return {
-		type : 'ADD_WEBCAM'
+		type : 'DISABLE_WEBCAM'
 	};
 };
 
