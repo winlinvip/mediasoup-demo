@@ -41,7 +41,7 @@ export const unmuteMic = () =>
 export const enableWebcam = () =>
 {
 	return {
-		type : 'DISABLE_WEBCAM'
+		type : 'ENABLE_WEBCAM'
 	};
 };
 
