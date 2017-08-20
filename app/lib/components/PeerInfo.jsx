@@ -41,7 +41,7 @@ const PeerInfo = ({ isMe, peer, onChangeDisplayName }) =>
 					)}
 				/>
 				<span className='device-version'>
-					{peer.device.name} {peer.device.version}
+					{peer.device.name} {Math.floor(peer.device.version)}
 				</span>
 			</div>
 		</div>
