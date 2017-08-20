@@ -21,6 +21,7 @@ export const Me = PropTypes.shape(
 	{
 		name             : PropTypes.string.isRequired,
 		displayName      : PropTypes.string,
+		displayNameSet   : PropTypes.bool.isRequired,
 		device           : Device.isRequired,
 		canSendMic       : PropTypes.bool.isRequired,
 		canSendWebcam    : PropTypes.bool.isRequired,

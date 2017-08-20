@@ -10,6 +10,7 @@
   {
     name             : 'bob',
     displayName      : 'Bob McFLower',
+    displayNameSet   : false, // true if got from cookie or manually set.
     device           : { name: 'Firefox', version: '61' },
     canSendMic       : true,
     canSendWebcam    : true,

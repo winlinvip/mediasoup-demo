@@ -82,14 +82,26 @@ function run()
 
 	// Get displayName from cookie.
 	const userCookie = cookiesManager.getUser() || {};
-	const displayName = userCookie.displayName || randomName();
+	let displayName;
+	let displayNameSet;
+
+	if (userCookie.displayName)
+	{
+		displayName = userCookie.displayName;
+		displayNameSet = true;
+	}
+	else
+	{
+		displayName = randomName();
+		displayNameSet = false;
+	}
 
 	// Get current device.
 	const device = getDeviceInfo();
 
 	// NOTE: I don't like this.
 	store.dispatch(
-		stateActions.setMe({ peerName, displayName, device }));
+		stateActions.setMe({ peerName, displayName, displayNameSet, device }));
 
 	// NOTE: I don't like this.
 	store.dispatch(

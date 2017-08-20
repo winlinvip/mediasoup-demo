@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as appPropTypes from './appPropTypes';
@@ -7,101 +8,153 @@ import * as requestActions from '../flux/requestActions';
 import PeerInfo from './PeerInfo';
 import Stream from './Stream';
 
-const Me = (props) =>
+class Me extends React.Component
 {
-	const {
-		connected,
-		me,
-		micProducer,
-		webcamProducer,
-		onChangeDisplayName,
-		onMuteMic,
-		onUnmuteMic,
-		onRemoveWebcam,
-		onAddWebcam,
-		onChangeWebcam
-	} = props;
+	constructor(props)
+	{
+		super(props);
 
-	let micState;
+		this._mounted = false;
+		this._rootNode = null;
+	}
 
-	if (!me.canSendMic)
-		micState = 'unsupported';
-	else if (!micProducer)
-		micState = 'unsupported';
-	else if (!micProducer.locallyPaused)
-		micState = 'on';
-	else if (micProducer.locallyPaused)
-		micState = 'off';
+	render()
+	{
+		const {
+			connected,
+			me,
+			micProducer,
+			webcamProducer,
+			onChangeDisplayName,
+			onMuteMic,
+			onUnmuteMic,
+			onRemoveWebcam,
+			onAddWebcam,
+			onChangeWebcam
+		} = this.props;
 
-	let webcamState;
+		let micState;
 
-	if (!me.canSendWebcam)
-		webcamState = 'unsupported';
-	else if (webcamProducer)
-		webcamState = 'on';
-	else
-		webcamState = 'off';
+		if (!me.canSendMic)
+			micState = 'unsupported';
+		else if (!micProducer)
+			micState = 'unsupported';
+		else if (!micProducer.locallyPaused)
+			micState = 'on';
+		else if (micProducer.locallyPaused)
+			micState = 'off';
 
-	let changeWebcamState;
+		let webcamState;
 
-	if (Boolean(webcamProducer) && me.canChangeWebcam)
-		changeWebcamState = 'on';
-	else
-		changeWebcamState = 'unsupported';
+		if (!me.canSendWebcam)
+			webcamState = 'unsupported';
+		else if (webcamProducer)
+			webcamState = 'on';
+		else
+			webcamState = 'off';
 
-	const videoVisible = (
-		Boolean(webcamProducer) &&
-		!webcamProducer.locallyPaused &&
-		!webcamProducer.remotelyPaused
-	);
+		let changeWebcamState;
 
-	return (
-		<div data-component='Me'>
-			{connected ?
-				<div className='controls'>
-					<div
-						className={classnames('button', 'mic', micState)}
-						onClick={() =>
-						{
-							micState === 'on' ? onMuteMic() : onUnmuteMic();
-						}}
-					/>
+		if (Boolean(webcamProducer) && me.canChangeWebcam)
+			changeWebcamState = 'on';
+		else
+			changeWebcamState = 'unsupported';
 
-					<div
-						className={classnames('button', 'webcam', webcamState, {
-							disabled : me.webcamInProgress
-						})}
-						onClick={() =>
-						{
-							webcamState === 'on' ? onRemoveWebcam() : onAddWebcam();
-						}}
-					/>
+		const videoVisible = (
+			Boolean(webcamProducer) &&
+			!webcamProducer.locallyPaused &&
+			!webcamProducer.remotelyPaused
+		);
 
-					<div
-						className={classnames('button', 'change-webcam', changeWebcamState, {
-							disabled : me.webcamInProgress
-						})}
-						onClick={() => onChangeWebcam()}
-					/>
-				</div>
-				:null
-			}
+		let tip;
 
-			<PeerInfo
-				isMe
-				peer={me}
-				onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
-			/>
+		if (!me.displayNameSet)
+			tip = 'Click on your name to change it';
 
-			<Stream
-				audioTrack={micProducer ? micProducer.track : null}
-				videoTrack={webcamProducer ? webcamProducer.track : null}
-				visible={videoVisible}
-				isMe
-			/>
-		</div>
-	);
-};
+		return (
+			<div
+				data-component='Me'
+				ref={(node) => (this._rootNode = node)}
+				data-tip={tip}
+				data-tip-disable={!tip}
+				data-type='dark'
+			>
+				{connected ?
+					<div className='controls'>
+						<div
+							className={classnames('button', 'mic', micState)}
+							onClick={() =>
+							{
+								micState === 'on' ? onMuteMic() : onUnmuteMic();
+							}}
+						/>
+
+						<div
+							className={classnames('button', 'webcam', webcamState, {
+								disabled : me.webcamInProgress
+							})}
+							onClick={() =>
+							{
+								webcamState === 'on' ? onRemoveWebcam() : onAddWebcam();
+							}}
+						/>
+
+						<div
+							className={classnames('button', 'change-webcam', changeWebcamState, {
+								disabled : me.webcamInProgress
+							})}
+							onClick={() => onChangeWebcam()}
+						/>
+					</div>
+					:null
+				}
+
+				<PeerInfo
+					isMe
+					peer={me}
+					onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
+				/>
+
+				<Stream
+					audioTrack={micProducer ? micProducer.track : null}
+					videoTrack={webcamProducer ? webcamProducer.track : null}
+					visible={videoVisible}
+					isMe
+				/>
+
+				<ReactTooltip
+					effect='solid'
+					delayShow={100}
+					delayHide={100}
+				/>
+			</div>
+		);
+	}
+
+	componentDidMount()
+	{
+		this._mounted = true;
+
+		setTimeout(() =>
+		{
+			if (!this._mounted || this.props.me.displayNameSet)
+				return;
+
+			ReactTooltip.show(this._rootNode);
+		}, 4000);
+	}
+
+	componentWillUnmount()
+	{
+		this._mounted = false;
+	}
+
+	componentWillReceiveProps(nextProps)
+	{
+		if (nextProps.me.displayNameSet)
+			ReactTooltip.hide(this._rootNode);
+	}
+}
 
 Me.propTypes =
 {

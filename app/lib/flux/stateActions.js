@@ -6,11 +6,11 @@ export const setRoomState = (state) =>
 	};
 };
 
-export const setMe = ({ peerName, displayName, device }) =>
+export const setMe = ({ peerName, displayName, displayNameSet, device }) =>
 {
 	return {
 		type    : 'SET_ME',
-		payload : { peerName, displayName, device }
+		payload : { peerName, displayName, displayNameSet, device }
 	};
 };
 

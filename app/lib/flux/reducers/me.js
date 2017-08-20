@@ -2,6 +2,7 @@ const initialState =
 {
 	name             : null,
 	displayName      : null,
+	displayNameSet   : false,
 	device           : null,
 	canSendMic       : false,
 	canSendWebcam    : false,
@@ -15,9 +16,9 @@ const me = (state = initialState, action) =>
 	{
 		case 'SET_ME':
 		{
-			const { peerName, displayName, device } = action.payload;
+			const { peerName, displayName, displayNameSet, device } = action.payload;
 
-			return { ...state, name: peerName, displayName, device };
+			return { ...state, name: peerName, displayName, displayNameSet, device };
 		}
 
 		case 'SET_MEDIA_CAPABILITIES':
@@ -43,14 +44,13 @@ const me = (state = initialState, action) =>
 
 		case 'SET_DISPLAY_NAME':
 		{
-			// Be ready for undefined displayName (so keep previous one).
 			let { displayName } = action.payload;
 
 			// Be ready for undefined displayName (so keep previous one).
 			if (!displayName)
 				displayName = state.displayName;
 
-			return { ...state, displayName };
+			return { ...state, displayName, displayNameSet: true };
 		}
 
 		default:
