@@ -1,15 +1,13 @@
 /**
  * Tasks:
  *
- * gulp prod
- *   Generates the browser app in production mode.
- *
- * gulp dev
- *   Generates the browser app in development mode.
+ * gulp dist
+ *   Generates the browser app in development mode (unless NODE_ENV is set
+ *   to 'production').
  *
  * gulp live
- *   Generates the browser app in development mode, opens it and watches
- *   for changes in the source code.
+ *   Generates the browser app in development mode (unless NODE_ENV is set
+ *   to 'production'), opens it and watches for changes in the source code.
  *
  * gulp
  *   Alias for `gulp live`.
@@ -47,8 +45,10 @@ const BANNER_OPTIONS =
 };
 const OUTPUT_DIR = '../server/public';
 
-// Default environment.
-process.env.NODE_ENV = 'development';
+// Set Node 'development' environment (unless externally set).
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
+gutil.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 
 function logError(error)
 {
@@ -124,22 +124,6 @@ function bundle(options)
 
 gulp.task('clean', () => del(OUTPUT_DIR, { force: true }));
 
-gulp.task('env:dev', (done) =>
-{
-	gutil.log('setting "dev" environment');
-
-	process.env.NODE_ENV = 'development';
-	done();
-});
-
-gulp.task('env:prod', (done) =>
-{
-	gutil.log('setting "prod" environment');
-
-	process.env.NODE_ENV = 'production';
-	done();
-});
-
 gulp.task('lint', () =>
 {
 	const src =
@@ -202,11 +186,6 @@ gulp.task('bundle', () =>
 gulp.task('bundle:watch', () =>
 {
 	return bundle({ watch: true });
-});
-
-gulp.task('test:bundle:watch', () =>
-{
-	return bundle({ watch: true, entries: 'test/index.jsx' });
 });
 
 gulp.task('livebrowser', (done) =>
@@ -273,18 +252,7 @@ gulp.task('watch', (done) =>
 	done();
 });
 
-gulp.task('prod', gulp.series(
-	'env:prod',
-	'clean',
-	'lint',
-	'bundle',
-	'html',
-	'css',
-	'resources'
-));
-
-gulp.task('dev', gulp.series(
-	'env:dev',
+gulp.task('dist', gulp.series(
 	'clean',
 	'lint',
 	'bundle',
@@ -294,7 +262,6 @@ gulp.task('dev', gulp.series(
 ));
 
 gulp.task('live', gulp.series(
-	'env:dev',
 	'clean',
 	'lint',
 	'bundle:watch',

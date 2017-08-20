@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 import * as appPropTypes from './appPropTypes';
 import * as stateActions from '../flux/stateActions';
-import { FadeIn } from './transitions';
+import { Appear } from './transitions';
 
 const Notifications = ({ notifications, onClick }) =>
 {
@@ -14,7 +14,7 @@ const Notifications = ({ notifications, onClick }) =>
 				notifications.map((notification) =>
 				{
 					return (
-						<FadeIn key={notification.id} duration={250}>
+						<Appear key={notification.id} duration={250}>
 							<div
 								className={classnames('notification', notification.type)}
 								onClick={() => onClick(notification.id)}
@@ -22,7 +22,7 @@ const Notifications = ({ notifications, onClick }) =>
 								<div className='icon' />
 								<p className='text'>{notification.text}</p>
 							</div>
-						</FadeIn>
+						</Appear>
 					);
 				})
 			}

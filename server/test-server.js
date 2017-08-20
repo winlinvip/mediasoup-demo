@@ -102,7 +102,7 @@ function handleProtooPeer(protooPeer)
 
 			case 'change-display-name':
 			{
-				setTimeout(accept, 2000);
+				setTimeout(accept, 1000);
 				// setTimeout(() => reject(500, 'Blablabla'), 2000);
 
 				break;
@@ -185,7 +185,7 @@ function handleMediasoupClientRequest(request, accept, reject)
 			setTimeout(() =>
 			{
 				accept(DATA.JOIN_ROOM_RESPONSE);
-			}, 600);
+			}, 100);
 
 			break;
 		}

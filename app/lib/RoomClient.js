@@ -243,6 +243,8 @@ export default class RoomClient
 				if (!device)
 					throw new Error('no webcam devices');
 
+				logger.debug('changeWebcam() | calling getUserMedia()');
+
 				return navigator.mediaDevices.getUserMedia(
 					{
 						video :
@@ -308,6 +310,8 @@ export default class RoomClient
 			.then(() =>
 			{
 				const { device, resolution } = this._webcam;
+
+				logger.debug('changeWebcamResolution() | calling getUserMedia()');
 
 				return navigator.mediaDevices.getUserMedia(
 					{
@@ -473,7 +477,7 @@ export default class RoomClient
 				// Add our mic.
 				if (this._room.canSend('audio'))
 				{
-					this._setMicProducer()
+					return this._setMicProducer()
 						.catch(() => {});
 				}
 			})
@@ -485,7 +489,7 @@ export default class RoomClient
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						this.enableWebcam();
+						return this.enableWebcam();
 				}
 			})
 			.then(() =>
@@ -541,6 +545,8 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
+				logger.debug('_setMicProducer() | calling getUserMedia()');
+
 				return navigator.mediaDevices.getUserMedia({ audio: true });
 			})
 			.then((stream) =>
@@ -637,6 +643,8 @@ export default class RoomClient
 				if (!device)
 					throw new Error('no webcam devices');
 
+				logger.debug('_setWebcamProducer() | calling getUserMedia()');
+
 				return navigator.mediaDevices.getUserMedia(
 					{
 						video :
@@ -731,6 +739,8 @@ export default class RoomClient
 		return Promise.resolve()
 			.then(() =>
 			{
+				logger.debug('_updateWebcams() | calling enumerateDevices()');
+
 				return navigator.mediaDevices.enumerateDevices();
 			})
 			.then((devices) =>

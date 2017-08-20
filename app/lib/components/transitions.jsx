@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { CSSTransition } from 'react-transition-group';
 
-const FadeIn = ({ duration, children }) => (
+const Appear = ({ duration, children }) => (
 	<CSSTransition
 		in
-		classNames='FadeIn'
+		classNames='Appear'
 		timeout={duration || 1000}
 		appear
 	>
@@ -13,10 +13,10 @@ const FadeIn = ({ duration, children }) => (
 	</CSSTransition>
 );
 
-FadeIn.propTypes =
+Appear.propTypes =
 {
 	duration : PropTypes.number,
 	children : PropTypes.any
 };
 
-export { FadeIn };
+export { Appear };

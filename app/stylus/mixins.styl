@@ -21,13 +21,13 @@ desktop()
 	@media (min-device-width: 721px)
 		{block}
 
-FadeIn($duration = 1s, $enterOpacity = 0, $activeOpacity = 1)
+AppearFadeIn($duration = 1s, $enterOpacity = 0, $activeOpacity = 1)
 	will-change: opacity;
 
-	&.FadeIn-appear
+	&.Appear-appear
 		opacity: $enterOpacity;
 
-	&.FadeIn-appear.FadeIn-appear-active
+	&.Appear-appear.Appear-appear-active
 		transition-property: opacity;
 		transition-duration: $duration;
 		opacity: $activeOpacity;

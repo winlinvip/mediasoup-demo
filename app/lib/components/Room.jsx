@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import ClipboardButton from 'react-clipboard.js';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../flux/requestActions';
-import { FadeIn } from './transitions';
+import { Appear } from './transitions';
 import Me from './Me';
 import Peers from './Peers';
 import Notifications from './Notifications';
@@ -13,7 +13,7 @@ import Notifications from './Notifications';
 const Room = ({ room, onRoomLinkCopy }) =>
 {
 	return (
-		<FadeIn duration={1000}>
+		<Appear duration={250}>
 			<div data-component='Room'>
 				<Notifications />
 
@@ -43,7 +43,7 @@ const Room = ({ room, onRoomLinkCopy }) =>
 					<Me />
 				</div>
 			</div>
-		</FadeIn>
+		</Appear>
 	);
 };
 
