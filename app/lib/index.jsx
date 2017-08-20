@@ -10,7 +10,6 @@ import {
 import thunk from 'redux-thunk';
 import { createLogger as createReduxLogger } from 'redux-logger';
 import { getDeviceInfo } from 'mediasoup-client';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import randomString from 'random-string';
 import randomName from 'node-random-name';
 import Logger from './Logger';
@@ -25,9 +24,11 @@ import Room from './components/Room';
 const REGEXP_FRAGMENT_ROOM_ID = new RegExp('^#roomId=([0-9a-zA-Z_-]+)$');
 
 const logger = new Logger();
-const reduxMiddlewares = [];
-
-reduxMiddlewares.push(thunk);
+const reduxMiddlewares =
+[
+	thunk,
+	roomClientMiddleware
+];
 
 if (process.env.NODE_ENV === 'development')
 {
@@ -42,15 +43,11 @@ if (process.env.NODE_ENV === 'development')
 	reduxMiddlewares.push(fluxLogger);
 }
 
-reduxMiddlewares.push(roomClientMiddleware);
-
 const store = createFluxStore(
 	reducers,
 	undefined,
 	applyFluxMiddleware(...reduxMiddlewares)
 );
-
-injectTapEventPlugin();
 
 domready(() =>
 {
