@@ -33,7 +33,6 @@
       source         : 'webcam', // mic/webcam
       deviceLabel    : 'Macbook Webcam',
       type           : 'front', // front/back
-      resolution     : 'vga', // qvga/vga/hd
       locallyPaused  : false,
       remotelyPaused : false,
       track          : MediaStreamTrack

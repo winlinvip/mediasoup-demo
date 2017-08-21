@@ -9,6 +9,7 @@ exports.ROOM_RTP_CAPABILITIES =
 			mimeType: 'audio/PCMA',
 			kind: 'audio',
 			clockRate: 8000,
+			channels: 1,
 			preferredPayloadType: 8,
 			rtcpFeedback: [],
 			parameters: {}
@@ -28,6 +29,7 @@ exports.ROOM_RTP_CAPABILITIES =
 			mimeType: 'audio/SILK',
 			kind: 'audio',
 			clockRate: 16000,
+			channels: 1,
 			preferredPayloadType: 97,
 			rtcpFeedback: [],
 			parameters: {}
@@ -206,6 +208,7 @@ exports.JOIN_ROOM_RESPONSE =
 								name: 'PCMA',
 								mimeType: 'audio/PCMA',
 								clockRate: 8000,
+								channels: 1,
 								payloadType: 8,
 								rtcpFeedback: [],
 								parameters: {}
@@ -315,7 +318,7 @@ exports.JOIN_ROOM_RESPONSE =
 			appData:
 			{
 				displayName: 'Carol McCain',
-				device: { name: 'Microsoft Edge', version: '11' }
+				device: { name: 'Microsoft Edge', version: '16' }
 			},
 			consumers:
 			[
@@ -333,6 +336,7 @@ exports.JOIN_ROOM_RESPONSE =
 								name: 'PCMA',
 								mimeType: 'audio/PCMA',
 								clockRate: 8000,
+								channels: 1,
 								payloadType: 8,
 								rtcpFeedback: [],
 								parameters: {}

@@ -59,6 +59,7 @@ export const changeWebcam = () =>
 	};
 };
 
+// This returns a redux-thunk action (a function).
 export const notify = ({ type = 'info', text, timeout }) =>
 {
 	if (!timeout)

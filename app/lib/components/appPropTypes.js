@@ -35,7 +35,6 @@ export const Producer = PropTypes.shape(
 		source         : PropTypes.oneOf([ 'mic', 'webcam' ]).isRequired,
 		deviceLabel    : PropTypes.string,
 		type           : PropTypes.oneOf([ 'front', 'back' ]),
-		resolution     : PropTypes.oneOf([ 'qvga', 'vga', 'hd' ]),
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
 		track          : PropTypes.any

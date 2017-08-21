@@ -523,6 +523,8 @@ export default class RoomClient
 					}));
 
 				this.close();
+
+				throw error;
 			});
 	}
 
@@ -670,7 +672,7 @@ export default class RoomClient
 			{
 				this._webcamProducer = producer;
 
-				const { device, resolution } = this._webcam;
+				const { device } = this._webcam;
 
 				this._dispatch(stateActions.addProducer(
 					{
@@ -678,7 +680,6 @@ export default class RoomClient
 						source         : 'webcam',
 						deviceLabel    : device.label,
 						type           : this._getWebcamType(device),
-						resolution     : resolution,
 						locallyPaused  : producer.locallyPaused,
 						remotelyPaused : producer.remotelyPaused,
 						track          : producer.track
