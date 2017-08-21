@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../flux/requestActions';
 import PeerInfo from './PeerInfo';
@@ -16,6 +17,12 @@ class Me extends React.Component
 
 		this._mounted = false;
 		this._rootNode = null;
+		this._enableTooltip = true;
+
+		// TODO: Issue when using react-tooltip in Edge:
+		//   https://github.com/wwayne/react-tooltip/issues/328
+		if (getDeviceInfo().flag === 'msedge')
+			this._enableTooltip = false;
 	}
 
 	render()
@@ -122,11 +129,14 @@ class Me extends React.Component
 					isMe
 				/>
 
-				<ReactTooltip
-					effect='solid'
-					delayShow={100}
-					delayHide={100}
-				/>
+				{this._enableTooltip ?
+					<ReactTooltip
+						effect='solid'
+						delayShow={100}
+						delayHide={100}
+					/>
+					:null
+				}
 			</div>
 		);
 	}
@@ -135,13 +145,16 @@ class Me extends React.Component
 	{
 		this._mounted = true;
 
-		setTimeout(() =>
+		if (this._enableTooltip)
 		{
-			if (!this._mounted || this.props.me.displayNameSet)
-				return;
+			setTimeout(() =>
+			{
+				if (!this._mounted || this.props.me.displayNameSet)
+					return;
 
-			ReactTooltip.show(this._rootNode);
-		}, 4000);
+				ReactTooltip.show(this._rootNode);
+			}, 4000);
+		}
 	}
 
 	componentWillUnmount()
@@ -151,8 +164,11 @@ class Me extends React.Component
 
 	componentWillReceiveProps(nextProps)
 	{
-		if (nextProps.me.displayNameSet)
-			ReactTooltip.hide(this._rootNode);
+		if (this._enableTooltip)
+		{
+			if (nextProps.me.displayNameSet)
+				ReactTooltip.hide(this._rootNode);
+		}
 	}
 }
 

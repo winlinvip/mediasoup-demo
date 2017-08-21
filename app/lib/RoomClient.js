@@ -30,7 +30,8 @@ export default class RoomClient
 	constructor({ roomId, peerName, displayName, device, dispatch })
 	{
 		logger.debug(
-			'constructor() [peerName:"%s", roomId:"%s"]', peerName, roomId);
+			'constructor() [roomId:"%s", peerName:"%s", displayName:"%s", device:%s]',
+			roomId, peerName, displayName, device.flag);
 
 		const protooUrl = getProtooUrl(peerName, roomId);
 		const protooTransport = new protooClient.WebSocketTransport(protooUrl);

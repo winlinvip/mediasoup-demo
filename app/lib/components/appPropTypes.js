@@ -13,6 +13,7 @@ export const Room = PropTypes.shape(
 
 export const Device = PropTypes.shape(
 	{
+		flag    : PropTypes.string.isRequired,
 		name    : PropTypes.string.isRequired,
 		version : PropTypes.string.isRequired
 	});

@@ -190,7 +190,7 @@ exports.JOIN_ROOM_RESPONSE =
 			appData:
 			{
 				displayName: 'Alice Thomsom',
-				device: { name: 'Firefox', version: '50' }
+				device: { flag: 'firefox', name: 'Firefox', version: '50' }
 			},
 			consumers:
 			[
@@ -318,7 +318,7 @@ exports.JOIN_ROOM_RESPONSE =
 			appData:
 			{
 				displayName: 'Carol McCain',
-				device: { name: 'Microsoft Edge', version: '16' }
+				device: { flag: 'msedge', name: 'Microsoft Edge', version: '16' }
 			},
 			consumers:
 			[
@@ -440,7 +440,7 @@ exports.BOB_NEW_PEER_NOTIFICATION =
 	appData:
 	{
 		displayName: 'Bob Smith',
-		device: { name: 'Safari', version: '11' }
+		device: { flag: 'safari', name: 'Safari', version: '11' }
 	},
 	consumers:
 	[

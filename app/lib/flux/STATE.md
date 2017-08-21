@@ -11,7 +11,7 @@
     name             : 'bob',
     displayName      : 'Bob McFLower',
     displayNameSet   : false, // true if got from cookie or manually set.
-    device           : { name: 'Firefox', version: '61' },
+    device           : { flag: 'firefox', name: 'Firefox', version: '61' },
     canSendMic       : true,
     canSendWebcam    : true,
     canChangeWebcam  : false,
@@ -44,7 +44,7 @@
     {
       name        : 'alice',
       displayName : 'Alice Thomsom',
-      device      : { name: 'Chrome', version: '58' },
+      device      : { flag: 'chrome', name: 'Chrome', version: '58' },
       consumers   : [ 5551, 5552 ]
     }
   },

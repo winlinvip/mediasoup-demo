@@ -35,10 +35,7 @@ const PeerInfo = ({ isMe, peer, onChangeDisplayName }) =>
 
 			<div className='row'>
 				<span
-					className={classnames(
-						'device-icon',
-						peer.device.name.replace(/ +/g, '')
-					)}
+					className={classnames('device-icon', peer.device.flag)}
 				/>
 				<span className='device-version'>
 					{peer.device.name} {Math.floor(peer.device.version)}
