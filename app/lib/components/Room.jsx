@@ -32,7 +32,7 @@ const Room = ({ room, onRoomLinkCopy }) =>
 							onSuccess={onRoomLinkCopy}
 							onClick={() => {}} // Avoid link action.
 						>
-							copy room link
+							invitation link
 						</ClipboardButton>
 					</div>
 				</div>
