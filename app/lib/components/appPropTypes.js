@@ -38,7 +38,8 @@ export const Producer = PropTypes.shape(
 		type           : PropTypes.oneOf([ 'front', 'back' ]),
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
-		track          : PropTypes.any
+		track          : PropTypes.any,
+		codec          : PropTypes.string.isRequired
 	});
 
 export const Peer = PropTypes.shape(
@@ -57,7 +58,8 @@ export const Consumer = PropTypes.shape(
 		supported      : PropTypes.bool.isRequired,
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
-		track          : PropTypes.any
+		track          : PropTypes.any,
+		codec          : PropTypes.string.isRequired
 	});
 
 export const Notification = PropTypes.shape(

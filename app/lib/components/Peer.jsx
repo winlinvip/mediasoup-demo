@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import * as appPropTypes from './appPropTypes';
-import PeerInfo from './PeerInfo';
-import Stream from './Stream';
+import PeerView from './PeerView';
 
 const Peer = (props) =>
 {
@@ -44,14 +43,13 @@ const Peer = (props) =>
 				:null
 			}
 
-			<PeerInfo
+			<PeerView
 				peer={peer}
-			/>
-
-			<Stream
 				audioTrack={micConsumer ? micConsumer.track : null}
 				videoTrack={webcamConsumer ? webcamConsumer.track : null}
-				visible={videoVisible}
+				videoVisible={videoVisible}
+				audioCodec={micConsumer ? micConsumer.codec : null}
+				videoCodec={webcamConsumer ? webcamConsumer.codec : null}
 			/>
 		</div>
 	);

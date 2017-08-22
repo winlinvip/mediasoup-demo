@@ -22,10 +22,11 @@
     1111 :
     {
       id             : 1111,
-      source         : 'mic', // mic/webcam
+      source         : 'mic', // mic/webcam,
       locallyPaused  : true,
       remotelyPaused : false,
-      track          : MediaStreamTrack
+      track          : MediaStreamTrack,
+      codec          : 'opus'
     },
     1112 :
     {
@@ -35,7 +36,8 @@
       type           : 'front', // front/back
       locallyPaused  : false,
       remotelyPaused : false,
-      track          : MediaStreamTrack
+      track          : MediaStreamTrack,
+      codec          : 'vp8',
     }
   },
   peers :
@@ -58,7 +60,8 @@
       supported      : true,
       locallyPaused  : false,
       remotelyPaused : false,
-      track          : MediaStreamTrack
+      track          : MediaStreamTrack,
+      codec          : 'opus'
     },
     5552 :
     {
@@ -68,7 +71,8 @@
       supported      : false,
       locallyPaused  : false,
       remotelyPaused : true,
-      track          : null
+      track          : null,
+      codec          : 'h264'
     }
   },
   notifications :

@@ -574,7 +574,8 @@ export default class RoomClient
 						source         : 'mic',
 						locallyPaused  : producer.locallyPaused,
 						remotelyPaused : producer.remotelyPaused,
-						track          : producer.track
+						track          : producer.track,
+						codec          : producer.rtpParameters.codecs[0].name
 					}));
 
 				producer.on('closed', (originator) =>
@@ -683,7 +684,8 @@ export default class RoomClient
 						type           : this._getWebcamType(device),
 						locallyPaused  : producer.locallyPaused,
 						remotelyPaused : producer.remotelyPaused,
-						track          : producer.track
+						track          : producer.track,
+						codec          : producer.rtpParameters.codecs[0].name
 					}));
 
 				producer.on('closed', (originator) =>
@@ -852,7 +854,8 @@ export default class RoomClient
 				supported      : consumer.supported,
 				locallyPaused  : consumer.locallyPaused,
 				remotelyPaused : consumer.remotelyPaused,
-				track          : null
+				track          : null,
+				codec          : consumer.rtpParameters.codecs[0].name
 			}));
 
 		consumer.on('closed', (originator) =>

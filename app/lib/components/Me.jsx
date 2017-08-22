@@ -6,8 +6,7 @@ import classnames from 'classnames';
 import { getDeviceInfo } from 'mediasoup-client';
 import * as appPropTypes from './appPropTypes';
 import * as requestActions from '../flux/requestActions';
-import PeerInfo from './PeerInfo';
-import Stream from './Stream';
+import PeerView from './PeerView';
 
 class Me extends React.Component
 {
@@ -17,12 +16,12 @@ class Me extends React.Component
 
 		this._mounted = false;
 		this._rootNode = null;
-		this._enableTooltip = true;
+		this._tooltip = true;
 
 		// TODO: Issue when using react-tooltip in Edge:
 		//   https://github.com/wwayne/react-tooltip/issues/328
 		if (getDeviceInfo().flag === 'msedge')
-			this._enableTooltip = false;
+			this._tooltip = false;
 	}
 
 	render()
@@ -116,20 +115,18 @@ class Me extends React.Component
 					:null
 				}
 
-				<PeerInfo
+				<PeerView
 					isMe
 					peer={me}
+					audioTrack={micProducer ? micProducer.track : null}
+					videoTrack={webcamProducer ? webcamProducer.track : null}
+					videoVisible={videoVisible}
+					audioCodec={micProducer ? micProducer.codec : null}
+					videoCodec={webcamProducer ? webcamProducer.codec : null}
 					onChangeDisplayName={(displayName) => onChangeDisplayName(displayName)}
 				/>
 
-				<Stream
-					audioTrack={micProducer ? micProducer.track : null}
-					videoTrack={webcamProducer ? webcamProducer.track : null}
-					visible={videoVisible}
-					isMe
-				/>
-
-				{this._enableTooltip ?
+				{this._tooltip ?
 					<ReactTooltip
 						effect='solid'
 						delayShow={100}
@@ -145,7 +142,7 @@ class Me extends React.Component
 	{
 		this._mounted = true;
 
-		if (this._enableTooltip)
+		if (this._tooltip)
 		{
 			setTimeout(() =>
 			{
@@ -164,7 +161,7 @@ class Me extends React.Component
 
 	componentWillReceiveProps(nextProps)
 	{
-		if (this._enableTooltip)
+		if (this._tooltip)
 		{
 			if (nextProps.me.displayNameSet)
 				ReactTooltip.hide(this._rootNode);

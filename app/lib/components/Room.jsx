@@ -13,13 +13,13 @@ import Notifications from './Notifications';
 const Room = ({ room, onRoomLinkCopy }) =>
 {
 	return (
-		<Appear duration={250}>
+		<Appear duration={300}>
 			<div data-component='Room'>
 				<Notifications />
 
 				<div className='state'>
 					<div className={classnames('icon', room.state)} />
-					<p className='text'>{room.state}</p>
+					<p className={classnames('text', room.state)}>{room.state}</p>
 				</div>
 
 				<div className='room-link-wrapper'>
@@ -30,7 +30,6 @@ const Room = ({ room, onRoomLinkCopy }) =>
 							button-href={window.location.href}
 							data-clipboard-text={window.location.href}
 							onSuccess={onRoomLinkCopy}
-							onClick={() => {}} // Avoid link action.
 						>
 							invitation link
 						</ClipboardButton>

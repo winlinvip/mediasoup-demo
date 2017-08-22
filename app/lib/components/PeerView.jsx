@@ -2,8 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import hark from 'hark';
+import { RIEInput } from 'riek';
+import * as appPropTypes from './appPropTypes';
 
-export default class Stream extends React.Component
+export default class PeerView extends React.Component
 {
 	constructor(props)
 	{
@@ -34,25 +36,86 @@ export default class Stream extends React.Component
 
 	render()
 	{
-		const { visible, isMe } = this.props;
-		const { volume, videoWidth, videoHeight } = this.state;
+		const {
+			isMe,
+			peer,
+			videoVisible,
+			audioCodec,
+			videoCodec,
+			onChangeDisplayName
+		} = this.props;
+
+		const {
+			volume,
+			videoWidth,
+			videoHeight
+		} = this.state;
 
 		return (
-			<div data-component='Stream'>
+			<div data-component='PeerView'>
+				<div className='info'>
+					<div className={classnames('media', { 'is-me': isMe })}>
+						<div className='box'>
+							{audioCodec ?
+								<p className='codec'>{audioCodec}</p>
+								:null
+							}
+
+							{videoCodec ?
+								<p className='codec'>{videoCodec}</p>
+								:null
+							}
+
+							{(videoVisible && videoWidth !== null) ?
+								<p className='resolution'>{videoWidth}x{videoHeight}</p>
+								:null
+							}
+						</div>
+					</div>
+
+					<div className={classnames('peer', { 'is-me': isMe })}>
+						{isMe ?
+							<RIEInput
+								value={peer.displayName}
+								propName='displayName'
+								className='display-name editable'
+								classLoading='loading'
+								classInvalid='invalid'
+								shouldBlockWhileLoading
+								editProps={{
+									maxLength   : 20,
+									autoCorrect : false,
+									spellCheck  : false
+								}}
+								validate={(string) => string.length >= 3}
+								change={({ displayName }) => onChangeDisplayName(displayName)}
+							/>
+							:
+							<span className='display-name'>
+								{peer.displayName}
+							</span>
+						}
+
+						<div className='row'>
+							<span
+								className={classnames('device-icon', peer.device.flag)}
+							/>
+							<span className='device-version'>
+								{peer.device.name} {Math.floor(peer.device.version)}
+							</span>
+						</div>
+					</div>
+				</div>
+
 				<video
 					ref='video'
-					className={classnames({ hidden: !visible, 'is-me': isMe })}
+					className={classnames({
+						hidden  : !videoVisible,
+						'is-me' : isMe
+					})}
 					autoPlay
 					muted={isMe}
 				/>
-
-				{(visible && videoWidth !== null) ?
-					<div className={classnames('resolution', { 'is-me': isMe })}>
-						<p>{videoWidth}x{videoHeight}</p>
-					</div>
-					:null
-				}
-
 
 				<div className='volume'>
 					<div className={classnames('bar', `level${volume}`)} />
@@ -152,7 +215,12 @@ export default class Stream extends React.Component
 	{
 		this._videoResolutionTimer = setInterval(() =>
 		{
+			const { videoWidth, videoHeight } = this.state;
 			const { video } = this.refs;
+
+			// Don't re-render if nothing changed.
+			if (video.videoWidth === videoWidth && video.videoHeight === videoHeight)
+				return;
 
 			this.setState(
 				{
@@ -168,10 +236,15 @@ export default class Stream extends React.Component
 	}
 }
 
-Stream.propTypes =
+PeerView.propTypes =
 {
-	audioTrack : PropTypes.any,
-	videoTrack : PropTypes.any,
-	visible    : PropTypes.bool.isRequired,
-	isMe       : PropTypes.bool
+	isMe : PropTypes.bool,
+	peer : PropTypes.oneOfType(
+		[ appPropTypes.Me, appPropTypes.Peer ]).isRequired,
+	audioTrack          : PropTypes.any,
+	videoTrack          : PropTypes.any,
+	videoVisible        : PropTypes.bool.isRequired,
+	audioCodec          : PropTypes.string,
+	videoCodec          : PropTypes.string,
+	onChangeDisplayName : PropTypes.func
 };
