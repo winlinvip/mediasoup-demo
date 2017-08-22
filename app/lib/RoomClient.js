@@ -455,7 +455,7 @@ export default class RoomClient
 			this._handlePeer(peer);
 		});
 
-		this._room.join(this._peerName, null, { displayName, device })
+		this._room.join(this._peerName, { displayName, device })
 			.then(() =>
 			{
 				// Create Transport for sending.
