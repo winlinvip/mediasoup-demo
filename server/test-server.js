@@ -180,7 +180,7 @@ function handleMediasoupClientRequest(request, accept, reject)
 			break;
 		}
 
-		case 'joinRoom':
+		case 'join':
 		{
 			setTimeout(() =>
 			{
@@ -240,7 +240,7 @@ function handleMediasoupClientNotification(notification)
 
 	switch (notification.method)
 	{
-		case 'leaveRoom':
+		case 'leave':
 		{
 			// TODO
 

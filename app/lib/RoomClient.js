@@ -14,8 +14,7 @@ const ROOM_OPTIONS =
 	transportOptions :
 	{
 		tcp : false
-	},
-	hidden : false
+	}
 };
 
 const VIDEO_CONSTRAINS =
@@ -41,6 +40,9 @@ export default class RoomClient
 
 		// Flux store dispatch function.
 		this._dispatch = dispatch;
+
+		// My peer name.
+		this._peerName = peerName;
 
 		// protoo-client Peer instance.
 		this._protoo = new protooClient.Peer(protooTransport);
@@ -453,7 +455,7 @@ export default class RoomClient
 			this._handlePeer(peer);
 		});
 
-		this._room.join(null, { displayName, device })
+		this._room.join(this._peerName, null, { displayName, device })
 			.then(() =>
 			{
 				// Create Transport for sending.
@@ -578,27 +580,27 @@ export default class RoomClient
 						codec          : producer.rtpParameters.codecs[0].name
 					}));
 
-				producer.on('closed', (originator) =>
+				producer.on('close', (originator) =>
 				{
 					logger.debug(
-						'mic Producer "closed" event [originator:%s]', originator);
+						'mic Producer "close" event [originator:%s]', originator);
 
 					this._micProducer = null;
 					this._dispatch(stateActions.removeProducer(producer.id));
 				});
 
-				producer.on('paused', (originator) =>
+				producer.on('pause', (originator) =>
 				{
 					logger.debug(
-						'mic Producer "paused" event [originator:%s]', originator);
+						'mic Producer "pause" event [originator:%s]', originator);
 
 					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
 				});
 
-				producer.on('resumed', (originator) =>
+				producer.on('resume', (originator) =>
 				{
 					logger.debug(
-						'mic Producer "resumed" event [originator:%s]', originator);
+						'mic Producer "resume" event [originator:%s]', originator);
 
 					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
 				});
@@ -688,27 +690,27 @@ export default class RoomClient
 						codec          : producer.rtpParameters.codecs[0].name
 					}));
 
-				producer.on('closed', (originator) =>
+				producer.on('close', (originator) =>
 				{
 					logger.debug(
-						'webcam Producer "closed" event [originator:%s]', originator);
+						'webcam Producer "close" event [originator:%s]', originator);
 
 					this._webcamProducer = null;
 					this._dispatch(stateActions.removeProducer(producer.id));
 				});
 
-				producer.on('paused', (originator) =>
+				producer.on('pause', (originator) =>
 				{
 					logger.debug(
-						'webcam Producer "paused" event [originator:%s]', originator);
+						'webcam Producer "pause" event [originator:%s]', originator);
 
 					this._dispatch(stateActions.setProducerPaused(producer.id, originator));
 				});
 
-				producer.on('resumed', (originator) =>
+				producer.on('resume', (originator) =>
 				{
 					logger.debug(
-						'webcam Producer "resumed" event [originator:%s]', originator);
+						'webcam Producer "resume" event [originator:%s]', originator);
 
 					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
 				});
@@ -817,10 +819,10 @@ export default class RoomClient
 			this._handleConsumer(consumer);
 		}
 
-		peer.on('closed', (originator) =>
+		peer.on('close', (originator) =>
 		{
 			logger.debug(
-				'peer "closed" event [name:"%s", originator:%s]',
+				'peer "close" event [name:"%s", originator:%s]',
 				peer.name, originator);
 
 			this._dispatch(stateActions.removePeer(peer.name));
@@ -858,29 +860,29 @@ export default class RoomClient
 				codec          : consumer.rtpParameters.codecs[0].name
 			}));
 
-		consumer.on('closed', (originator) =>
+		consumer.on('close', (originator) =>
 		{
 			logger.debug(
-				'consumer "closed" event [id:%s, originator:%s, consumer:%o]',
+				'consumer "close" event [id:%s, originator:%s, consumer:%o]',
 				consumer.id, originator, consumer);
 
 			this._dispatch(stateActions.removeConsumer(
 				consumer.id, consumer.peer.name));
 		});
 
-		consumer.on('paused', (originator) =>
+		consumer.on('pause', (originator) =>
 		{
 			logger.debug(
-				'consumer "paused" event [id:%s, originator:%s, consumer:%o]',
+				'consumer "pause" event [id:%s, originator:%s, consumer:%o]',
 				consumer.id, originator, consumer);
 
 			this._dispatch(stateActions.setConsumerPaused(consumer.id, originator));
 		});
 
-		consumer.on('resumed', (originator) =>
+		consumer.on('resume', (originator) =>
 		{
 			logger.debug(
-				'consumer "resumed" event [id:%s, originator:%s, consumer:%o]',
+				'consumer "resume" event [id:%s, originator:%s, consumer:%o]',
 				consumer.id, originator, consumer);
 
 			this._dispatch(stateActions.setConsumerResumed(consumer.id, originator));
