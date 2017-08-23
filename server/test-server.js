@@ -257,7 +257,7 @@ function handleMediasoupClientNotification(notification)
 	}
 }
 
-// Listen for keyboard input.
+/* eslint-disable */
 
 let terminal;
 
@@ -283,12 +283,11 @@ function openTerminal()
 
 function stdinLog(msg)
 {
-	// eslint-disable-next-line no-console
 	console.log(colors.green(msg));
 }
 
-// function stdinError(msg)
-// {
-// 	// eslint-disable-next-line no-console
-// 	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
-// }
+
+function stdinError(msg)
+{
+	console.error(colors.red.bold('ERROR: ') + colors.red(msg));
+}
