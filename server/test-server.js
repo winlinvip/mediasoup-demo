@@ -14,8 +14,10 @@ const url = require('url');
 const protooServer = require('protoo-server');
 const colors = require('colors/safe');
 const repl = require('repl');
-const logger = require('./lib/logger')();
+const Logger = require('./lib/Logger');
 const DATA = require('./test-data');
+
+const logger = new Logger();
 
 // HTTPS server for the protoo WebSocjet server.
 const tls =
@@ -32,7 +34,7 @@ const httpsServer = https.createServer(tls, (req, res) =>
 
 httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
 {
-	logger.log('protoo WebSocket server running');
+	logger.info('protoo WebSocket server running');
 });
 
 // Protoo WebSocket server.
@@ -64,7 +66,7 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		return;
 	}
 
-	logger.log('connection request [roomId:"%s", peerName:"%s"]', roomId, peerName);
+	logger.info('connection request [roomId:"%s", peerName:"%s"]', roomId, peerName);
 
 	const transport = accept();
 	const protooPeer = protooRoom.createPeer(peerName, transport);

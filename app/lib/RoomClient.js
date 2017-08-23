@@ -444,7 +444,11 @@ export default class RoomClient
 				'sending mediasoup notification [method:%s]:%o',
 				notification.method, notification);
 
-			this._protoo.send('mediasoup-notification', notification);
+			this._protoo.send('mediasoup-notification', notification)
+				.catch((error) =>
+				{
+					logger.warn('could not send mediasoup notification:%o', error);
+				});
 		});
 
 		this._room.on('newpeer', (peer) =>

@@ -1,7 +1,7 @@
 module.exports =
 {
 	// DEBUG env variable For the NPM debug module.
-	debug  : '*LOG* *WARN* *ERROR* *mediasoup-worker*',
+	debug  : '*INFO* *WARN* *ERROR* *mediasoup-worker*',
 	// Listening hostname for `gulp live|open`.
 	domain : 'localhost',
 	tls    :
@@ -54,12 +54,6 @@ module.exports =
 				clockRate : 90000
 			}
 		],
-		// mediasoup per Peer Transport settings.
-		peerTransport :
-		{
-			udp : true,
-			tcp : true
-		},
 		// mediasoup per Peer max sending bitrate (in kpbs).
 		maxBitrate : 500000
 	}

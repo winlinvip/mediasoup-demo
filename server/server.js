@@ -20,8 +20,10 @@ const mediasoup = require('mediasoup');
 const readline = require('readline');
 const colors = require('colors/safe');
 const repl = require('repl');
-const logger = require('./lib/logger')();
+const Logger = require('./lib/Logger');
 const Room = require('./lib/Room');
+
+const logger = new Logger();
 
 // Map of Room instances indexed by roomId.
 const rooms = new Map();
@@ -41,6 +43,7 @@ const mediaServer = mediasoup.Server(
 	});
 
 global.SERVER = mediaServer;
+
 mediaServer.on('newroom', (room) =>
 {
 	global.ROOM = room;
@@ -61,7 +64,7 @@ const httpsServer = https.createServer(tls, (req, res) =>
 
 httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
 {
-	logger.log('protoo WebSocket server running');
+	logger.info('protoo WebSocket server running');
 });
 
 // Protoo WebSocket server.
@@ -78,26 +81,30 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 {
 	// The client indicates the roomId and peerId in the URL query.
 	const u = url.parse(info.request.url, true);
-	const roomId = u.query['room-id'];
-	const peerId = u.query['peer-id'];
+	const roomId = u.query['roomId'];
+	const peerName = u.query['peerName'];
 
-	if (!roomId || !peerId)
+	if (!roomId || !peerName)
 	{
-		logger.warn('connection request without roomId and/or peerId');
+		logger.warn('connection request without roomId and/or peerName');
 
-		reject(400, 'Connection request without roomId and/or peerId');
+		reject(400, 'Connection request without roomId and/or peerName');
 
 		return;
 	}
 
-	logger.log('connection request [roomId:"%s", peerId:"%s"]', roomId, peerId);
+	logger.info(
+		'connection request [roomId:"%s", peerName:"%s"]', roomId, peerName);
+
+	let room;
 
 	// If an unknown roomId, create a new Room.
 	if (!rooms.has(roomId))
 	{
-		logger.debug('creating a new Room [roomId:"%s"]', roomId);
+		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
-		const room = new Room(roomId, mediaServer);
+		room = new Room(roomId, mediaServer);
+
 		const logStatusTimer = setInterval(() =>
 		{
 			room.logStatus();
@@ -111,15 +118,28 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 			clearInterval(logStatusTimer);
 		});
 	}
+	else
+	{
+		room = rooms.get(roomId);
+	}
 
-	const room = rooms.get(roomId);
-	const transport = accept();
+	// If the room is ready continue.
+	if (room.ready)
+	{
+		const transport = accept();
 
-	room.createProtooPeer(peerId, transport)
-		.catch((error) =>
+		room.handleConnection(peerName, transport);
+	}
+	// Otherwise wait until ready.
+	else
+	{
+		room.once('ready', () =>
 		{
-			logger.error('error creating a protoo peer: %s', error);
+			const transport = accept();
+
+			room.handleConnection(peerName, transport);
 		});
+	}
 });
 
 // Listen for keyboard input.

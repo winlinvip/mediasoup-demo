@@ -1,36 +1,37 @@
 const EventEmitter = require('events').EventEmitter;
 const protooServer = require('protoo-server');
-const webrtc = require('mediasoup').webrtc;
-const logger = require('./logger')('Room');
+const Logger = require('./Logger');
 const config = require('../config');
 
 const MAX_BITRATE = config.mediasoup.maxBitrate || 3000000;
 const MIN_BITRATE = Math.min(50000 || MAX_BITRATE);
 const BITRATE_FACTOR = 0.75;
-const MIN_AUDIO_LEVEL = -50;
+
+const logger = new Logger('Room');
 
 class Room extends EventEmitter
 {
 	constructor(roomId, mediaServer)
 	{
-		logger.log('constructor() [roomId:"%s"]', roomId);
+		logger.info('constructor() [roomId:"%s"]', roomId);
 
 		super();
 		this.setMaxListeners(Infinity);
 
 		// Room ID.
 		this._roomId = roomId;
+
+		// Closed flag.
+		this._closed = false;
+
 		// Protoo Room instance.
 		this._protooRoom = new protooServer.Room();
+
 		// mediasoup Room instance.
 		this._mediaRoom = null;
-		// Pending peers (this is because at the time we get the first peer, the
-		// mediasoup room does not yet exist).
-		this._pendingProtooPeers = [];
+
 		// Current max bitrate for all the participants.
 		this._maxBitrate = MAX_BITRATE;
-		// Current active speaker mediasoup Peer.
-		this._activeSpeaker = null;
 
 		// Create a mediasoup room.
 		mediaServer.createRoom(
@@ -43,79 +44,18 @@ class Room extends EventEmitter
 
 				this._mediaRoom = room;
 
-				process.nextTick(() =>
+				this._mediaRoom.on('newpeer', (peer) =>
 				{
-					this._mediaRoom.on('newpeer', (peer) =>
+					this._updateMaxBitrate();
+
+					peer.on('close', () =>
 					{
 						this._updateMaxBitrate();
-
-						peer.on('close', () =>
-						{
-							this._updateMaxBitrate();
-						});
-					});
-
-					// TODO: FIX
-					this._mediaRoom.on('____audiolevels', (entries) =>
-					{
-						logger.debug('room "audiolevels" event');
-
-						for (const entry of entries)
-						{
-							logger.debug('- [peer name:%s, rtpReceiver.id:%s, audio level:%s]',
-								entry.peer.name, entry.rtpReceiver.id, entry.audioLevel);
-						}
-
-						let activeSpeaker;
-						let activeLevel;
-
-						if (entries.length > 0)
-						{
-							activeSpeaker = entries[0].peer;
-							activeLevel = entries[0].audioLevel;
-
-							if (activeLevel < MIN_AUDIO_LEVEL)
-							{
-								activeSpeaker = null;
-								activeLevel = undefined;
-							}
-						}
-						else
-						{
-							activeSpeaker = null;
-						}
-
-						if (this._activeSpeaker !== activeSpeaker)
-						{
-							const data = {};
-
-							if (activeSpeaker)
-							{
-								logger.debug('active speaker [peer:"%s", volume:%s]',
-									activeSpeaker.name, activeLevel);
-
-								data.peer = { id: activeSpeaker.name };
-								data.level = activeLevel;
-							}
-							else
-							{
-								logger.debug('no current speaker');
-
-								data.peer = null;
-							}
-
-							this._protooRoom.spread('activespeaker', data);
-						}
-
-						this._activeSpeaker = activeSpeaker;
 					});
 				});
 
-				// Run all the pending join requests.
-				for (const protooPeer of this._pendingProtooPeers)
-				{
-					this._handleProtooPeer(protooPeer);
-				}
+				// Emit 'ready'.
+				this.emit('ready');
 			});
 	}
 
@@ -124,9 +64,16 @@ class Room extends EventEmitter
 		return this._roomId;
 	}
 
+	get ready()
+	{
+		return Boolean(this._mediaRoom);
+	}
+
 	close()
 	{
 		logger.debug('close()');
+
+		this._closed = true;
 
 		// Close the protoo Room.
 		this._protooRoom.close();
@@ -144,374 +91,237 @@ class Room extends EventEmitter
 		if (!this._mediaRoom)
 			return;
 
-		logger.log(
+		logger.info(
 			'logStatus() [room id:"%s", protoo peers:%s, mediasoup peers:%s]',
 			this._roomId,
 			this._protooRoom.peers.length,
 			this._mediaRoom.peers.length);
 	}
 
-	createProtooPeer(peerId, transport)
+	handleConnection(peerName, transport)
 	{
-		logger.log('createProtooPeer() [peerId:"%s"]', peerId);
+		logger.info('handleConnection() [peerName:"%s"]', peerName);
 
-		if (this._protooRoom.hasPeer(peerId))
+		if (this._protooRoom.hasPeer(peerName))
 		{
 			logger.warn(
-				'createProtooPeer() | there is already a peer with same peerId, ' +
-				'closing the previous one [peerId:"%s"]',
-				peerId);
+				'handleConnection() | there is already a peer with same peerName, ' +
+				'closing the previous one [peerName:"%s"]',
+				peerName);
 
-			const protooPeer = this._protooRoom.getPeer(peerId);
+			const protooPeer = this._protooRoom.getPeer(peerName);
 
 			protooPeer.close();
 		}
 
-		return this._protooRoom.createPeer(peerId, transport)
-			.then((protooPeer) =>
-			{
-				if (this._mediaRoom)
-					this._handleProtooPeer(protooPeer);
-				else
-					this._pendingProtooPeers.push(protooPeer);
-			});
+		const protooPeer = this._protooRoom.createPeer(peerName, transport);
+
+		this._handleProtooPeer(protooPeer);
 	}
 
 	_handleProtooPeer(protooPeer)
 	{
-		logger.debug('_handleProtooPeer() [peerId:"%s"]', protooPeer.id);
+		logger.debug('_handleProtooPeer() [peer:"%s"]', protooPeer.id);
 
-		const mediaPeer = this._mediaRoom.Peer(protooPeer.id);
-		let peerconnection;
+		protooPeer.on('request', (request, accept, reject) =>
+		{
+			logger.debug(
+				'protoo "request" event [method:%s, peer:"%s"]',
+				request.method, protooPeer.id);
 
-		protooPeer.data.msids = [];
+			switch (request.method)
+			{
+				case 'mediasoup-request':
+				{
+					const mediasoupRequest = request.data;
+
+					this._handleMediasoupClientRequest(
+						protooPeer, mediasoupRequest, accept, reject);
+
+					break;
+				}
+
+				case 'mediasoup-notification':
+				{
+					accept();
+
+					const mediasoupNotification = request.data;
+
+					this._handleMediasoupClientNotification(
+						protooPeer, mediasoupNotification);
+
+					break;
+				}
+
+				case 'change-display-name':
+				{
+					accept();
+
+					const { displayName } = request.data;
+
+					// Spread to others via protoo.
+					this._protooRoom.spread(
+						'display-name-changed',
+						{
+							peer :
+							{
+								peerName    : protooPeer.id,
+								displayName : displayName
+							}
+						});
+
+					break;
+				}
+
+				default:
+				{
+					logger.error('unknown request.method "%s"', request.method);
+
+					reject(400, `unknown request.method "${request.method}"`);
+				}
+			}
+		});
 
 		protooPeer.on('close', () =>
 		{
-			logger.debug('protoo Peer "close" event [peerId:"%s"]', protooPeer.id);
+			logger.debug('protoo Peer "close" event [peer:"%s"]', protooPeer.id);
 
-			this._protooRoom.spread(
-				'removepeer',
-				{
-					peer :
-					{
-						id    : protooPeer.id,
-						msids : protooPeer.data.msids
-					}
-				});
+			const { mediaPeer } = protooPeer.data;
 
-			// Close the media stuff.
-			if (peerconnection)
-				peerconnection.close();
-			else
+			if (mediaPeer && !mediaPeer.closed)
 				mediaPeer.close();
 
 			// If this is the latest peer in the room, close the room.
-			// However, wait a bit (for reconnections).
+			// However wait a bit (for reconnections).
 			setTimeout(() =>
 			{
 				if (this._mediaRoom && this._mediaRoom.closed)
 					return;
 
-				if (this._protooRoom.peers.length === 0)
+				if (this._mediaRoom.peers.length === 0)
 				{
-					logger.log(
+					logger.info(
 						'last peer in the room left, closing the room [roomId:"%s"]',
 						this._roomId);
 
 					this.close();
 				}
-			}, 10000);
+			}, 5000);
 		});
-
-		Promise.resolve()
-			// Send 'join' request to the new peer.
-			.then(() =>
-			{
-				return protooPeer.send(
-					'joinme',
-					{
-						peerId : protooPeer.id,
-						roomId : this.id
-					});
-			})
-			// Create a RTCPeerConnection instance and set media capabilities.
-			.then((data) =>
-			{
-				peerconnection = new webrtc.RTCPeerConnection(
-					{
-						peer             : mediaPeer,
-						usePlanB         : Boolean(data.usePlanB),
-						transportOptions : config.mediasoup.peerTransport,
-						maxBitrate       : this._maxBitrate
-					});
-
-				// Store the RTCPeerConnection instance within the protoo Peer.
-				protooPeer.data.peerconnection = peerconnection;
-
-				mediaPeer.on('newtransport', (transport) =>
-				{
-					transport.on('iceselectedtuplechange', (data2) =>
-					{
-						logger.log(
-							'"iceselectedtuplechange" event ' +
-							'[peerId:"%s", protocol:%s, remoteIP:%s, remotePort:%s]',
-							protooPeer.id, data2.protocol, data2.remoteIP, data2.remotePort);
-					});
-				});
-
-				// Set RTCPeerConnection capabilities.
-				return peerconnection.setCapabilities(data.capabilities);
-			})
-			// Send 'peers' request for the new peer to know about the existing peers.
-			.then(() =>
-			{
-				return protooPeer.send(
-					'peers',
-					{
-						peers : this._protooRoom.peers
-							// Filter this protoo Peer.
-							.filter((peer) =>
-							{
-								return peer !== protooPeer;
-							})
-							.map((peer) =>
-							{
-								return {
-									id    : peer.id,
-									msids : peer.data.msids
-								};
-							})
-					});
-			})
-			// Tell all the other peers about the new peer.
-			.then(() =>
-			{
-				this._protooRoom.spread(
-					'addpeer',
-					{
-						peer :
-						{
-							id    : protooPeer.id,
-							msids : protooPeer.data.msids
-						}
-					},
-					[ protooPeer ]);
-			})
-			.then(() =>
-			{
-				// Send initial SDP offer.
-				return this._sendOffer(protooPeer,
-					{
-						offerToReceiveAudio : 1,
-						offerToReceiveVideo : 1
-					});
-			})
-			.then(() =>
-			{
-				// Handle PeerConnection events.
-				peerconnection.on('negotiationneeded', () =>
-				{
-					logger.debug('"negotiationneeded" event [peerId:"%s"]', protooPeer.id);
-
-					// Send SDP re-offer.
-					this._sendOffer(protooPeer);
-				});
-
-				peerconnection.on('signalingstatechange', () =>
-				{
-					logger.debug(
-						'"signalingstatechange" event [peerId:"%s", signalingState:%s]',
-						protooPeer.id, peerconnection.signalingState);
-				});
-			})
-			.then(() =>
-			{
-				protooPeer.on('request', (request, accept, reject) =>
-				{
-					logger.debug('protoo Peer "request" event [method:%s]', request.method);
-
-					switch (request.method)
-					{
-						case 'reofferme':
-						{
-							accept();
-							this._sendOffer(protooPeer);
-
-							break;
-						}
-
-						case 'restartice':
-						{
-							peerconnection.restartIce()
-								.then(() =>
-								{
-									accept();
-								})
-								.catch((error) =>
-								{
-									logger.error('"restartice" request failed: %s', error);
-									logger.error(`stack:\n${error.stack}`);
-
-									reject(500, `"restartice" failed: ${error.message}`);
-								});
-
-							break;
-						}
-
-						case 'disableremotevideo':
-						{
-							const videoMsid = request.data.msid;
-							const disable = request.data.disable;
-							let videoRtpSender;
-
-							for (const rtpSender of mediaPeer.rtpSenders)
-							{
-								if (rtpSender.kind !== 'video')
-									continue;
-
-								const msid = rtpSender.rtpParameters.userParameters.msid.split(/\s/)[0];
-
-								if (msid === videoMsid)
-								{
-									videoRtpSender = rtpSender;
-									break;
-								}
-							}
-
-							if (videoRtpSender)
-							{
-								return Promise.resolve()
-									.then(() =>
-									{
-										if (disable)
-											return videoRtpSender.disable({ emit: false });
-										else
-											return videoRtpSender.enable({ emit: false });
-									})
-									.then(() =>
-									{
-										logger.log(
-											'"disableremotevideo" request succeed [disable:%s]',
-											Boolean(disable));
-
-										accept();
-									})
-									.catch((error) =>
-									{
-										logger.error('"disableremotevideo" request failed: %s', error);
-										logger.error(`stack:\n${error.stack}`);
-
-										reject(500, `"disableremotevideo" failed: ${error.message}`);
-									});
-							}
-							else
-							{
-								reject(404, 'msid not found');
-							}
-
-							break;
-						}
-
-						default:
-						{
-							logger.error('unknown method');
-
-							reject(404, 'unknown method');
-						}
-					}
-				});
-			})
-			.catch((error) =>
-			{
-				logger.error('_handleProtooPeer() failed: %s', error.message);
-				logger.error(`stack:\n${error.stack}`);
-
-				protooPeer.close();
-			});
 	}
 
-	_sendOffer(protooPeer, options)
+	_handleMediasoupClientRequest(protooPeer, request, accept, reject)
 	{
-		logger.debug('_sendOffer() [peerId:"%s"]', protooPeer.id);
+		logger.debug(
+			'mediasoup-client request [method:%s, peer:"%s"]',
+			request.method, protooPeer.id);
 
-		const peerconnection = protooPeer.data.peerconnection;
-		const mediaPeer = peerconnection.peer;
-
-		return Promise.resolve()
-			.then(() =>
+		switch (request.method)
+		{
+			case 'queryRoom':
 			{
-				return peerconnection.createOffer(options);
-			})
-			.then((desc) =>
-			{
-				return peerconnection.setLocalDescription(desc);
-			})
-			// Send the SDP offer to the peer.
-			.then(() =>
-			{
-				return protooPeer.send(
-					'offer',
-					{
-						offer : peerconnection.localDescription.serialize()
-					});
-			})
-			// Process the SDP answer from the peer.
-			.then((data) =>
-			{
-				const answer = data.answer;
+				this._mediaRoom.receiveRequest(request)
+					.then((response) => accept(response))
+					.catch((error) => reject(500, error.toString()));
 
-				return peerconnection.setRemoteDescription(answer);
-			})
-			.then(() =>
+				break;
+			}
+
+			case 'join':
 			{
-				const oldMsids = protooPeer.data.msids;
+				// TODO: Handle appData.
+				const { peerName } = request;
 
-				// Reset peer's msids.
-				protooPeer.data.msids = [];
-
-				const setMsids = new Set();
-
-				// Update peer's msids information.
-				for (const rtpReceiver of mediaPeer.rtpReceivers)
+				if (peerName !== protooPeer.id)
 				{
-					const msid = rtpReceiver.rtpParameters.userParameters.msid.split(/\s/)[0];
+					reject(403, 'that is not your corresponding mediasoup Peer name');
 
-					setMsids.add(msid);
+					break;
+				}
+				else if (protooPeer.data.mediaPeer)
+				{
+					reject(500, 'already have a mediasoup Peer');
+
+					break;
 				}
 
-				protooPeer.data.msids = Array.from(setMsids);
-
-				// If msids changed, notify.
-				const sameValues = (
-					oldMsids.length == protooPeer.data.msids.length) &&
-					oldMsids.every((element, index) =>
+				this._mediaRoom.receiveRequest(request)
+					.then((response) =>
 					{
-						return element === protooPeer.data.msids[index];
+						accept(response);
+
+						// Get the newly created mediasoup Peer.
+						const mediaPeer = this._mediaRoom.getPeerByName(peerName);
+
+						protooPeer.data.mediaPeer = mediaPeer;
+
+						this._handleMediaPeer(protooPeer, mediaPeer);
+					})
+					.catch((error) =>
+					{
+						reject(500, error.toString());
 					});
 
-				if (!sameValues)
-				{
-					this._protooRoom.spread(
-						'updatepeer',
-						{
-							peer :
-							{
-								id    : protooPeer.id,
-								msids : protooPeer.data.msids
-							}
-						},
-						[ protooPeer ]);
-				}
-			})
-			.catch((error) =>
-			{
-				logger.error('_sendOffer() failed: %s', error);
-				logger.error(`stack:\n${error.stack}`);
+				break;
+			}
 
-				logger.warn('resetting peerconnection');
-				peerconnection.reset();
-			});
+			default:
+			{
+				const { mediaPeer } = protooPeer.data;
+
+				if (!mediaPeer)
+				{
+					logger.error(
+						'cannot handle mediasoup request, no mediasoup Peer [method:"%s"]',
+						request.method);
+
+					reject(400, 'no mediasoup Peer');
+				}
+
+				mediaPeer.receiveRequest(request)
+					.then((response) => accept(response))
+					.catch((error) => reject(500, error.toString()));
+			}
+		}
+	}
+
+	_handleMediasoupClientNotification(protooPeer, notification)
+	{
+		logger.debug(
+			'mediasoup-client notification [method:%s, peer:"%s"]',
+			notification.method, protooPeer.id);
+
+		switch (notification.method)
+		{
+			default:
+			{
+				const { mediaPeer } = protooPeer.data;
+
+				if (!mediaPeer)
+				{
+					logger.error(
+						'cannot handle mediasoup notification, no mediasoup Peer [method:"%s"]',
+						notification.method);
+				}
+
+				mediaPeer.receiveNotification(notification);
+			}
+		}
+	}
+
+	_handleMediaPeer(protooPeer, mediaPeer)
+	{
+		mediaPeer.on('close', () =>
+		{
+			if (!protooPeer.closed)
+				protooPeer.close();
+		});
+
+		mediaPeer.on('notify', (notification) =>
+		{
+			protooPeer.send('mediasoup-notification', notification)
+				.catch(() => {});
+		});
 	}
 
 	_updateMaxBitrate()
@@ -552,7 +362,7 @@ class Room extends EventEmitter
 			}
 		}
 
-		logger.log(
+		logger.info(
 			'_updateMaxBitrate() [num peers:%s, before:%skbps, now:%skbps]',
 			numPeers,
 			Math.round(previousMaxBitrate / 1000),
