@@ -70,7 +70,6 @@ const mapDispatchToProps = (dispatch) =>
 	};
 };
 
-
 const RoomContainer = connect(
 	mapStateToProps,
 	mapDispatchToProps
