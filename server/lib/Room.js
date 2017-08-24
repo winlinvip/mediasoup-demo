@@ -213,6 +213,15 @@ class Room extends EventEmitter
 		});
 	}
 
+	_handleMediaPeer(protooPeer, mediaPeer)
+	{
+		mediaPeer.on('notify', (notification) =>
+		{
+			protooPeer.send('mediasoup-notification', notification)
+				.catch(() => {});
+		});
+	}
+
 	_handleMediasoupClientRequest(protooPeer, request, accept, reject)
 	{
 		logger.debug(
@@ -308,21 +317,6 @@ class Room extends EventEmitter
 		}
 
 		mediaPeer.receiveNotification(notification);
-	}
-
-	_handleMediaPeer(protooPeer, mediaPeer)
-	{
-		mediaPeer.on('close', () =>
-		{
-			if (!protooPeer.closed)
-				protooPeer.close();
-		});
-
-		mediaPeer.on('notify', (notification) =>
-		{
-			protooPeer.send('mediasoup-notification', notification)
-				.catch(() => {});
-		});
 	}
 
 	_updateMaxBitrate()
