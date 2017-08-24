@@ -36,21 +36,22 @@ module.exports =
 		rtcMinPort       : 40000,
 		rtcMaxPort       : 49999,
 		// mediasoup Room settings.
-		roomCodecs       :
+		mediaCodecs       :
 		[
 			{
 				kind       : 'audio',
-				name       : 'audio/opus',
+				name       : 'opus',
 				clockRate  : 48000,
+				channels   : 2,
 				parameters :
 				{
-					useInbandFec : 1,
+					useinbandfec : 1,
 					minptime     : 10
 				}
 			},
 			{
 				kind      : 'video',
-				name      : 'video/vp8',
+				name      : 'vp8',
 				clockRate : 90000
 			}
 		],

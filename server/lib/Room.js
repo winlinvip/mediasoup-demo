@@ -24,39 +24,25 @@ class Room extends EventEmitter
 		// Closed flag.
 		this._closed = false;
 
-		// Protoo Room instance.
-		this._protooRoom = new protooServer.Room();
+		try
+		{
+			// Protoo Room instance.
+			this._protooRoom = new protooServer.Room();
 
-		// mediasoup Room instance.
-		this._mediaRoom = null;
+			// mediasoup Room instance.
+			this._mediaRoom = mediaServer.Room(config.mediasoup.mediaCodecs);
+		}
+		catch (error)
+		{
+			this.close();
+
+			throw error;
+		}
 
 		// Current max bitrate for all the participants.
 		this._maxBitrate = MAX_BITRATE;
 
-		// Create a mediasoup room.
-		mediaServer.createRoom(
-			{
-				mediaCodecs : config.mediasoup.roomCodecs
-			})
-			.then((room) =>
-			{
-				logger.debug('mediasoup room created');
-
-				this._mediaRoom = room;
-
-				this._mediaRoom.on('newpeer', (peer) =>
-				{
-					this._updateMaxBitrate();
-
-					peer.on('close', () =>
-					{
-						this._updateMaxBitrate();
-					});
-				});
-
-				// Emit 'ready'.
-				this.emit('ready');
-			});
+		this._handleMediaRoom();
 	}
 
 	get id()
@@ -76,7 +62,8 @@ class Room extends EventEmitter
 		this._closed = true;
 
 		// Close the protoo Room.
-		this._protooRoom.close();
+		if (this._protooRoom)
+			this._protooRoom.close();
 
 		// Close the mediasoup Room.
 		if (this._mediaRoom)
@@ -117,6 +104,21 @@ class Room extends EventEmitter
 		const protooPeer = this._protooRoom.createPeer(peerName, transport);
 
 		this._handleProtooPeer(protooPeer);
+	}
+
+	_handleMediaRoom()
+	{
+		logger.debug('_handleMediaRoom()');
+
+		this._mediaRoom.on('newpeer', (peer) =>
+		{
+			this._updateMaxBitrate();
+
+			peer.on('close', () =>
+			{
+				this._updateMaxBitrate();
+			});
+		});
 	}
 
 	_handleProtooPeer(protooPeer)
@@ -291,22 +293,20 @@ class Room extends EventEmitter
 			'mediasoup-client notification [method:%s, peer:"%s"]',
 			notification.method, protooPeer.id);
 
-		switch (notification.method)
+		// NOTE: mediasoup-client just sends notifications with target 'peer',
+		// so first of all, get the mediasoup Peer.
+		const { mediaPeer } = protooPeer.data;
+
+		if (!mediaPeer)
 		{
-			default:
-			{
-				const { mediaPeer } = protooPeer.data;
+			logger.error(
+				'cannot handle mediasoup notification, no mediasoup Peer [method:"%s"]',
+				notification.method);
 
-				if (!mediaPeer)
-				{
-					logger.error(
-						'cannot handle mediasoup notification, no mediasoup Peer [method:"%s"]',
-						notification.method);
-				}
-
-				mediaPeer.receiveNotification(notification);
-			}
+			return;
 		}
+
+		mediaPeer.receiveNotification(notification);
 	}
 
 	_handleMediaPeer(protooPeer, mediaPeer)

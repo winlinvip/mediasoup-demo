@@ -111,3 +111,16 @@ function run()
 		document.getElementById('mediasoup-demo-app-container')
 	);
 }
+
+// TODO: Debugging stuff.
+
+global.sendSdp = function()
+{
+	console.debug('---------- SEND_TRANSPORT LOCAL SDP:');
+	console.debug(
+		global.CLIENT._sendTransport._handler._pc.localDescription.sdp);
+
+	console.debug('---------- SEND_TRANSPORT REMOTE SDP:');
+	console.debug(
+		global.CLIENT._sendTransport._handler._pc.remoteDescription.sdp);
+};

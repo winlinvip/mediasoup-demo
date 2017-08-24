@@ -530,8 +530,6 @@ export default class RoomClient
 					}));
 
 				this.close();
-
-				throw error;
 			});
 	}
 

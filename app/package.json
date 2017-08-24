@@ -16,7 +16,7 @@
     "mediasoup-client": "git://github.com/versatica/mediasoup-client.git#master",
     "node-random-name": "^1.0.1",
     "prop-types": "^15.5.10",
-    "protoo-client": "^2.0.2",
+    "protoo-client": "^2.0.3",
     "random-string": "^0.2.0",
     "react": "^15.6.1",
     "react-clipboard.js": "^1.1.2",

@@ -10,7 +10,7 @@
     "colors": "^1.1.2",
     "debug": "^3.0.0",
     "express": "^4.15.4",
-    "protoo-server": "^2.0.2"
+    "protoo-server": "^2.0.3"
   },
   "devDependencies": {
     "babel-plugin-transform-object-assign": "^6.22.0",

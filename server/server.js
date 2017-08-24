@@ -103,7 +103,18 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 	{
 		logger.info('creating a new Room [roomId:"%s"]', roomId);
 
-		room = new Room(roomId, mediaServer);
+		try
+		{
+			room = new Room(roomId, mediaServer);
+		}
+		catch (error)
+		{
+			logger.error('error creating a new Room: %s', error);
+
+			reject(error);
+
+			return;
+		}
 
 		const logStatusTimer = setInterval(() =>
 		{
@@ -123,23 +134,9 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		room = rooms.get(roomId);
 	}
 
-	// If the room is ready continue.
-	if (room.ready)
-	{
-		const transport = accept();
+	const transport = accept();
 
-		room.handleConnection(peerName, transport);
-	}
-	// Otherwise wait until ready.
-	else
-	{
-		room.once('ready', () =>
-		{
-			const transport = accept();
-
-			room.handleConnection(peerName, transport);
-		});
-	}
+	room.handleConnection(peerName, transport);
 });
 
 // Listen for keyboard input.
