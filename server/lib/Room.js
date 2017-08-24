@@ -170,7 +170,8 @@ class Room extends EventEmitter
 								peerName    : protooPeer.id,
 								displayName : displayName
 							}
-						});
+						},
+						[ protooPeer ]);
 
 					break;
 				}

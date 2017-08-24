@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import hark from 'hark';
-import { RIEInput } from 'riek';
 import * as appPropTypes from './appPropTypes';
+import EditableInput from './EditableInput';
 
 export default class PeerView extends React.Component
 {
@@ -75,7 +75,7 @@ export default class PeerView extends React.Component
 
 					<div className={classnames('peer', { 'is-me': isMe })}>
 						{isMe ?
-							<RIEInput
+							<EditableInput
 								value={peer.displayName}
 								propName='displayName'
 								className='display-name editable'
@@ -87,8 +87,7 @@ export default class PeerView extends React.Component
 									autoCorrect : false,
 									spellCheck  : false
 								}}
-								validate={(string) => string.length >= 3}
-								change={({ displayName }) => onChangeDisplayName(displayName)}
+								onChange={({ displayName }) => onChangeDisplayName(displayName)}
 							/>
 							:
 							<span className='display-name'>
