@@ -9,7 +9,7 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "classnames": "^2.2.5",
-    "debug": "git://github.com/ibc/debug.git#disable-colors-in-edge-and-ie",
+    "debug": "^3.0.1",
     "domready": "^1.0.8",
     "hark": "^1.1.5",
     "js-cookie": "^2.1.4",

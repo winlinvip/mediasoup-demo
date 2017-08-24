@@ -8,7 +8,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "colors": "^1.1.2",
-    "debug": "^3.0.0",
+    "debug": "^3.0.1",
     "express": "^4.15.4",
     "protoo-server": "^2.0.3"
   },
