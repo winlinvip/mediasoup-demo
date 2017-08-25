@@ -594,9 +594,6 @@ export default class RoomClient
 
 				producer.on('close', (originator) =>
 				{
-					// TODO: REMOVE
-					console.error('--------------------------------- MIC PRODUCER CLOSED BY %s', originator);
-
 					logger.debug(
 						'mic Producer "close" event [originator:%s]', originator);
 
