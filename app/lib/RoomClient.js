@@ -394,12 +394,12 @@ export default class RoomClient
 				'_handleProtooRequest() [method:%s, data:%o]',
 				request.method, request.data);
 
-			accept();
-
 			switch (request.method)
 			{
 				case 'mediasoup-notification':
 				{
+					accept();
+
 					const notification = request.data;
 
 					this._room.receiveNotification(notification);

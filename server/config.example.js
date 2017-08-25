@@ -36,7 +36,7 @@ module.exports =
 		rtcMinPort       : 40000,
 		rtcMaxPort       : 49999,
 		// mediasoup Room settings.
-		mediaCodecs       :
+		mediaCodecs      :
 		[
 			{
 				kind       : 'audio',
