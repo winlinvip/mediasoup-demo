@@ -354,16 +354,14 @@ export default class RoomClient
 	{
 		this._dispatch(stateActions.setRoomState('connecting'));
 
-		const protoo = this._protoo;
-
-		protoo.on('open', () =>
+		this._protoo.on('open', () =>
 		{
 			logger.debug('protoo Peer "open" event');
 
 			this._joinRoom({ displayName, device });
 		});
 
-		protoo.on('disconnected', () =>
+		this._protoo.on('disconnected', () =>
 		{
 			logger.warn('protoo Peer "disconnected" event');
 
@@ -380,7 +378,7 @@ export default class RoomClient
 			this._dispatch(stateActions.setRoomState('connecting'));
 		});
 
-		protoo.on('close', () =>
+		this._protoo.on('close', () =>
 		{
 			if (this._closed)
 				return;
@@ -427,6 +425,18 @@ export default class RoomClient
 		// WebSocket re-connects, so we must clean existing event listeners. Otherwise
 		// they will be called twice after the reconnection.
 		this._room.removeAllListeners();
+
+		this._room.on('close', (originator, appData) =>
+		{
+			if (originator === 'remote')
+			{
+				logger.warn('mediasoup Peer/Room remotely closed [appData:%o]', appData);
+
+				this._dispatch(stateActions.setRoomState('closed'));
+
+				return;
+			}
+		});
 
 		this._room.on('request', (request, callback, errback) =>
 		{
@@ -584,6 +594,9 @@ export default class RoomClient
 
 				producer.on('close', (originator) =>
 				{
+					// TODO: REMOVE
+					console.error('--------------------------------- MIC PRODUCER CLOSED BY %s', originator);
+
 					logger.debug(
 						'mic Producer "close" event [originator:%s]', originator);
 

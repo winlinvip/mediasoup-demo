@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 process.title = 'mediasoup-demo-server';
 
 const config = require('./config');
@@ -47,6 +49,16 @@ global.SERVER = mediaServer;
 mediaServer.on('newroom', (room) =>
 {
 	global.ROOM = room;
+
+	room.on('newpeer', (peer) =>
+	{
+		global.PEER = peer;
+
+		peer.on('newtransport', (transport) =>
+		{
+			global.TRANSPORT = transport;
+		});
+	});
 });
 
 // HTTPS server for the protoo WebSocjet server.
@@ -119,7 +131,7 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		const logStatusTimer = setInterval(() =>
 		{
 			room.logStatus();
-		}, 10000);
+		}, 30000);
 
 		rooms.set(roomId, room);
 
@@ -143,6 +155,8 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 
 let cmd;
 let terminal;
+
+openCommandConsole();
 
 function openCommandConsole()
 {
@@ -294,17 +308,6 @@ function closeTerminal()
 		terminal = undefined;
 	}
 }
-
-openCommandConsole();
-
-// Export openCommandConsole function by typing 'c'.
-Object.defineProperty(global, 'c',
-	{
-		get : function()
-		{
-			openCommandConsole();
-		}
-	});
 
 function stdinLog(msg)
 {

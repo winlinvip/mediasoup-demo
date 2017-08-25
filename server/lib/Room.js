@@ -1,3 +1,5 @@
+'use strict';
+
 const EventEmitter = require('events').EventEmitter;
 const protooServer = require('protoo-server');
 const Logger = require('./Logger');
