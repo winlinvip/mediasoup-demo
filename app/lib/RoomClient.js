@@ -870,7 +870,8 @@ export default class RoomClient
 				remotelyPaused : consumer.remotelyPaused,
 				track          : null,
 				codec          : consumer.rtpParameters.codecs[0].name
-			}));
+			},
+			consumer.peer.name));
 
 		consumer.on('close', (originator) =>
 		{

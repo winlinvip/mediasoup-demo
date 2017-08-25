@@ -102,19 +102,19 @@ export const removePeer = (peerName) =>
 	};
 };
 
-export const addConsumer = (consumer) =>
+export const addConsumer = (consumer, peerName) =>
 {
 	return {
 		type    : 'ADD_CONSUMER',
-		payload : { consumer }
+		payload : { consumer, peerName }
 	};
 };
 
-export const removeConsumer = (consumerId) =>
+export const removeConsumer = (consumerId, peerName) =>
 {
 	return {
 		type    : 'REMOVE_CONSUMER',
-		payload : { consumerId }
+		payload : { consumerId, peerName }
 	};
 };
 

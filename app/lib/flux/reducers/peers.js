@@ -23,8 +23,7 @@ const peers = (state = initialState, action) =>
 
 		case 'ADD_CONSUMER':
 		{
-			const { consumer } = action.payload;
-			const { peerName } = consumer;
+			const { consumer, peerName } = action.payload;
 			const peer = state[peerName];
 
 			if (!peer)
