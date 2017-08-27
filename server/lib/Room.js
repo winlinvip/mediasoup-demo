@@ -222,6 +222,36 @@ class Room extends EventEmitter
 			protooPeer.send('mediasoup-notification', notification)
 				.catch(() => {});
 		});
+
+		mediaPeer.on('newtransport', (transport) =>
+		{
+			transport.on('close', (originator) =>
+			{
+				logger.debug(
+					'Transport "close" event [originator:%s]', originator);
+			});
+		});
+
+		mediaPeer.on('newproducer', (producer) =>
+		{
+			producer.on('close', (originator) =>
+			{
+				logger.debug(
+					'Producer "close" event [originator:%s]', originator);
+			});
+
+			producer.on('pause', (originator) =>
+			{
+				logger.debug(
+					'Producer "pause" event [originator:%s]', originator);
+			});
+
+			producer.on('resume', (originator) =>
+			{
+				logger.debug(
+					'Producer "resume" event [originator:%s]', originator);
+			});
+		});
 	}
 
 	_handleMediasoupClientRequest(protooPeer, request, accept, reject)

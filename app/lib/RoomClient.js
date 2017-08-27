@@ -476,9 +476,21 @@ export default class RoomClient
 				this._sendTransport =
 					this._room.createTransport('send', { media: 'SEND_MIC_WEBCAM' });
 
+				this._sendTransport.on('close', (originator) =>
+				{
+					logger.debug(
+						'sending Transport "close" event [originator:%s]', originator);
+				});
+
 				// Create Transport for receiving.
 				this._recvTransport =
 					this._room.createTransport('recv', { media: 'RECV' });
+
+				this._recvTransport.on('close', (originator) =>
+				{
+					logger.debug(
+						'receiving Transport "close" event [originator:%s]', originator);
+				});
 			})
 			.then(() =>
 			{

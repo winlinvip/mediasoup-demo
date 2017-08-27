@@ -116,11 +116,22 @@ function run()
 
 global.sendSdp = function()
 {
-	logger.debug('---------- SEND_TRANSPORT LOCAL SDP:');
+	logger.debug('---------- SEND_TRANSPORT LOCAL SDP OFFER:');
 	logger.debug(
 		global.CLIENT._sendTransport._handler._pc.localDescription.sdp);
 
-	logger.debug('---------- SEND_TRANSPORT REMOTE SDP:');
+	logger.debug('---------- SEND_TRANSPORT REMOTE SDP ANSWER:');
 	logger.debug(
 		global.CLIENT._sendTransport._handler._pc.remoteDescription.sdp);
+};
+
+global.recvSdp = function()
+{
+	logger.debug('---------- RECV_TRANSPORT REMOTE SDP OFFER:');
+	logger.debug(
+		global.CLIENT._recvTransport._handler._pc.remoteDescription.sdp);
+
+	logger.debug('---------- RECV_TRANSPORT LOCAL SDP ANSWER:');
+	logger.debug(
+		global.CLIENT._recvTransport._handler._pc.localDescription.sdp);
 };

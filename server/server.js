@@ -58,6 +58,16 @@ mediaServer.on('newroom', (room) =>
 		{
 			global.TRANSPORT = transport;
 		});
+
+		peer.on('newproducer', (producer) =>
+		{
+			global.PRODUCER = producer;
+			global.DUMP_PRODUCER = function()
+			{
+				global.PRODUCER.dump()
+					.then((data) => console.log(JSON.stringify(data, null, '  ')));
+			};
+		});
 	});
 });
 
