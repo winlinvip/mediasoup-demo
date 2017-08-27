@@ -570,13 +570,13 @@ export default class RoomClient
 			{
 				const track = stream.getAudioTracks()[0];
 
-				producer = this._room.createProducer(track);
+				producer = this._room.createProducer(track, { source: 'mic' });
 
 				// No need to keep original track.
 				track.stop();
 
 				// Send it.
-				return this._sendTransport.send(producer);
+				return producer.send(this._sendTransport);
 			})
 			.then(() =>
 			{
@@ -615,6 +615,16 @@ export default class RoomClient
 						'mic Producer "resume" event [originator:%s]', originator);
 
 					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
+				});
+
+				producer.on('handled', () =>
+				{
+					logger.debug('mic Producer "handled" event');
+				});
+
+				producer.on('unhandled', () =>
+				{
+					logger.debug('mic Producer "unhandled" event');
 				});
 			})
 			.then(() =>
@@ -676,13 +686,13 @@ export default class RoomClient
 			{
 				const track = stream.getVideoTracks()[0];
 
-				producer = this._room.createProducer(track);
+				producer = this._room.createProducer(track, { source: 'webcam' });
 
 				// No need to keep original track.
 				track.stop();
 
 				// Send it.
-				return this._sendTransport.send(producer);
+				return producer.send(this._sendTransport);
 			})
 			.then(() =>
 			{
@@ -725,6 +735,16 @@ export default class RoomClient
 						'webcam Producer "resume" event [originator:%s]', originator);
 
 					this._dispatch(stateActions.setProducerResumed(producer.id, originator));
+				});
+
+				producer.on('handled', () =>
+				{
+					logger.debug('webcam Producer "handled" event');
+				});
+
+				producer.on('unhandled', () =>
+				{
+					logger.debug('webcam Producer "unhandled" event');
 				});
 			})
 			.then(() =>
@@ -904,7 +924,7 @@ export default class RoomClient
 		// Receive the consumer (if we can).
 		if (consumer.supported)
 		{
-			this._recvTransport.receive(consumer)
+			consumer.receive(this._recvTransport)
 				.then((track) =>
 				{
 					this._dispatch(stateActions.setConsumerTrack(consumer.id, track));

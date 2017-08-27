@@ -116,11 +116,11 @@ function run()
 
 global.sendSdp = function()
 {
-	console.debug('---------- SEND_TRANSPORT LOCAL SDP:');
-	console.debug(
+	logger.debug('---------- SEND_TRANSPORT LOCAL SDP:');
+	logger.debug(
 		global.CLIENT._sendTransport._handler._pc.localDescription.sdp);
 
-	console.debug('---------- SEND_TRANSPORT REMOTE SDP:');
-	console.debug(
+	logger.debug('---------- SEND_TRANSPORT REMOTE SDP:');
+	logger.debug(
 		global.CLIENT._sendTransport._handler._pc.remoteDescription.sdp);
 };
