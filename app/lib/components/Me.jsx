@@ -45,9 +45,9 @@ class Me extends React.Component
 			micState = 'unsupported';
 		else if (!micProducer)
 			micState = 'unsupported';
-		else if (!micProducer.locallyPaused)
+		else if (!micProducer.locallyPaused && !micProducer.remotelyPaused)
 			micState = 'on';
-		else if (micProducer.locallyPaused)
+		else
 			micState = 'off';
 
 		let webcamState;
