@@ -123,6 +123,8 @@ webSocketServer.on('connectionrequest', (info, accept, reject) =>
 		try
 		{
 			room = new Room(roomId, mediaServer);
+
+			global.APP_ROOM = room;
 		}
 		catch (error)
 		{

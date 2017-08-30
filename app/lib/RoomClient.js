@@ -479,7 +479,7 @@ export default class RoomClient
 				this._sendTransport.on('close', (originator) =>
 				{
 					logger.debug(
-						'sending Transport "close" event [originator:%s]', originator);
+						'Transport "close" event [originator:%s]', originator);
 				});
 
 				// Create Transport for receiving.
