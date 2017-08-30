@@ -52,11 +52,6 @@ class Room extends EventEmitter
 		return this._roomId;
 	}
 
-	get ready()
-	{
-		return Boolean(this._mediaRoom);
-	}
-
 	close()
 	{
 		logger.debug('close()');

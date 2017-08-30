@@ -62,11 +62,6 @@ mediaServer.on('newroom', (room) =>
 		peer.on('newproducer', (producer) =>
 		{
 			global.PRODUCER = producer;
-			global.DUMP_PRODUCER = function()
-			{
-				global.PRODUCER.dump()
-					.then((data) => console.log(JSON.stringify(data, null, '  ')));
-			};
 		});
 	});
 });
@@ -205,10 +200,13 @@ function openCommandConsole()
 				{
 					stdinLog('');
 					stdinLog('available commands:');
-					stdinLog('- h,  help       : show this message');
-					stdinLog('- sd, serverdump : execute server.dump()');
-					stdinLog('- rd, roomdump   : execute room.dump() for the latest created mediasoup Room');
-					stdinLog('- t,  terminal   : open REPL Terminal');
+					stdinLog('- h,  help          : show this message');
+					stdinLog('- sd, serverdump    : execute server.dump()');
+					stdinLog('- rd, roomdump      : execute room.dump() for the latest created mediasoup Room');
+					stdinLog('- pd, peerdump      : execute peer.dump() for the latest created mediasoup Peer');
+					stdinLog('- td, transportdump : execute transport.dump() for the latest created mediasoup Transport');
+					stdinLog('- prd, producerdump : execute producer.dump() for the latest created mediasoup Producer');
+					stdinLog('- t,  terminal      : open REPL Terminal');
 					stdinLog('');
 					readStdin();
 
@@ -221,7 +219,7 @@ function openCommandConsole()
 					mediaServer.dump()
 						.then((data) =>
 						{
-							stdinLog(`mediaServer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							stdinLog(`server.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
 							readStdin();
 						})
 						.catch((error) =>
@@ -245,14 +243,84 @@ function openCommandConsole()
 					global.ROOM.dump()
 						.then((data) =>
 						{
-							stdinLog('global.ROOM.dump() succeeded');
-							stdinLog(`- peers:\n${JSON.stringify(data.peers, null, '  ')}`);
-							stdinLog(`- num peers: ${data.peers.length}`);
+							stdinLog(`room.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
 							readStdin();
 						})
 						.catch((error) =>
 						{
-							stdinError(`global.ROOM.dump() failed: ${error}`);
+							stdinError(`room.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'pd':
+				case 'peerdump':
+				{
+					if (!global.PEER)
+					{
+						readStdin();
+						break;
+					}
+
+					global.PEER.dump()
+						.then((data) =>
+						{
+							stdinLog(`peer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`peer.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'td':
+				case 'transportdump':
+				{
+					if (!global.TRANSPORT)
+					{
+						readStdin();
+						break;
+					}
+
+					global.TRANSPORT.dump()
+						.then((data) =>
+						{
+							stdinLog(`transport.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`transport.dump() failed: ${error}`);
+							readStdin();
+						});
+
+					break;
+				}
+
+				case 'prd':
+				case 'producerdump':
+				{
+					if (!global.PRODUCER)
+					{
+						readStdin();
+						break;
+					}
+
+					global.PRODUCER.dump()
+						.then((data) =>
+						{
+							stdinLog(`producer.dump() succeeded:\n${JSON.stringify(data, null, '  ')}`);
+							readStdin();
+						})
+						.catch((error) =>
+						{
+							stdinError(`producer.dump() failed: ${error}`);
 							readStdin();
 						});
 
@@ -294,10 +362,7 @@ function openTerminal()
 			ignoreUndefined : true
 		});
 
-	terminal.on('exit', () =>
-	{
-		process.exit();
-	});
+	terminal.on('exit', () => openCommandConsole());
 }
 
 function closeCommandConsole()
