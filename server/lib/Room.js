@@ -162,11 +162,8 @@ class Room extends EventEmitter
 					this._protooRoom.spread(
 						'display-name-changed',
 						{
-							peer :
-							{
-								peerName    : protooPeer.id,
-								displayName : displayName
-							}
+							peerName    : protooPeer.id,
+							displayName : displayName
 						},
 						[ protooPeer ]);
 

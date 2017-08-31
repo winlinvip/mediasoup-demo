@@ -407,6 +407,17 @@ export default class RoomClient
 					break;
 				}
 
+				case 'display-name-changed':
+				{
+					// eslint-disable-next-line no-shadow
+					const { peerName, displayName } = request.data;
+
+					this._dispatch(
+						stateActions.setPeerDisplayName(displayName, peerName));
+
+					break;
+				}
+
 				default:
 				{
 					logger.error('unknown protoo method "%s"', request.method);

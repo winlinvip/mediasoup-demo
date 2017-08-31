@@ -102,6 +102,14 @@ export const removePeer = (peerName) =>
 	};
 };
 
+export const setPeerDisplayName = (displayName, peerName) =>
+{
+	return {
+		type    : 'SET_PEER_DISPLAY_NAME',
+		payload : { displayName, peerName }
+	};
+};
+
 export const addConsumer = (consumer, peerName) =>
 {
 	return {
