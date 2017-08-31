@@ -410,10 +410,15 @@ export default class RoomClient
 				case 'display-name-changed':
 				{
 					// eslint-disable-next-line no-shadow
-					const { peerName, displayName } = request.data;
+					const { peerName, displayName, oldDisplayName } = request.data;
 
 					this._dispatch(
 						stateActions.setPeerDisplayName(displayName, peerName));
+
+					this._dispatch(requestActions.notify(
+						{
+							text : `${oldDisplayName} is now ${displayName}`
+						}));
 
 					break;
 				}

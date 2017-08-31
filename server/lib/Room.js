@@ -157,13 +157,18 @@ class Room extends EventEmitter
 					accept();
 
 					const { displayName } = request.data;
+					const { mediaPeer } = protooPeer.data;
+					const oldDisplayName = mediaPeer.appData.displayName;
+
+					mediaPeer.appData.displayName = displayName;
 
 					// Spread to others via protoo.
 					this._protooRoom.spread(
 						'display-name-changed',
 						{
-							peerName    : protooPeer.id,
-							displayName : displayName
+							peerName       : protooPeer.id,
+							displayName    : displayName,
+							oldDisplayName : oldDisplayName
 						},
 						[ protooPeer ]);
 
