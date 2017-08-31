@@ -220,32 +220,82 @@ class Room extends EventEmitter
 
 		mediaPeer.on('newtransport', (transport) =>
 		{
-			transport.on('close', (originator) =>
-			{
-				logger.debug(
-					'Transport "close" event [originator:%s]', originator);
-			});
+			logger.info('mediaPeer "newtransport" event [id:%s]', transport.id);
+
+			this._handleMediaTransport(transport);
 		});
 
 		mediaPeer.on('newproducer', (producer) =>
 		{
-			producer.on('close', (originator) =>
-			{
-				logger.debug(
-					'Producer "close" event [originator:%s]', originator);
-			});
+			logger.info('mediaPeer "newproducer" event [id:%s]', producer.id);
 
-			producer.on('pause', (originator) =>
-			{
-				logger.debug(
-					'Producer "pause" event [originator:%s]', originator);
-			});
+			this._handleMediaProducer(producer);
+		});
 
-			producer.on('resume', (originator) =>
-			{
-				logger.debug(
-					'Producer "resume" event [originator:%s]', originator);
-			});
+		mediaPeer.on('newconsumer', (consumer) =>
+		{
+			logger.info('mediaPeer "newconsumer" event [id:%s]', consumer.id);
+
+			this._handleMediaConsumer(consumer);
+		});
+
+		// Also handle already existing Consumers.
+		for (const consumer of mediaPeer.consumers)
+		{
+			logger.info('mediaPeer existing "consumer" [id:%s]', consumer.id);
+
+			this._handleMediaConsumer(consumer);
+		}
+	}
+
+	_handleMediaTransport(transport)
+	{
+		transport.on('close', (originator) =>
+		{
+			logger.info(
+				'Transport "close" event [originator:%s]', originator);
+		});
+	}
+
+	_handleMediaProducer(producer)
+	{
+		producer.on('close', (originator) =>
+		{
+			logger.info(
+				'Producer "close" event [originator:%s]', originator);
+		});
+
+		producer.on('pause', (originator) =>
+		{
+			logger.info(
+				'Producer "pause" event [originator:%s]', originator);
+		});
+
+		producer.on('resume', (originator) =>
+		{
+			logger.info(
+				'Producer "resume" event [originator:%s]', originator);
+		});
+	}
+
+	_handleMediaConsumer(consumer)
+	{
+		consumer.on('close', (originator) =>
+		{
+			logger.info(
+				'Consumer "close" event [originator:%s]', originator);
+		});
+
+		consumer.on('pause', (originator) =>
+		{
+			logger.info(
+				'Consumer "pause" event [originator:%s]', originator);
+		});
+
+		consumer.on('resume', (originator) =>
+		{
+			logger.info(
+				'Consumer "resume" event [originator:%s]', originator);
 		});
 	}
 
@@ -268,7 +318,7 @@ class Room extends EventEmitter
 
 			case 'join':
 			{
-				// TODO: Handle appData.
+				// TODO: Handle appData. Yes?
 				const { peerName } = request;
 
 				if (peerName !== protooPeer.id)

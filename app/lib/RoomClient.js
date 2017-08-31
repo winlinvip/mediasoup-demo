@@ -506,7 +506,7 @@ export default class RoomClient
 				// Add our mic.
 				if (this._room.canSend('audio'))
 				{
-					return this._setMicProducer()
+					this._setMicProducer()
 						.catch(() => {});
 				}
 			})
@@ -518,7 +518,7 @@ export default class RoomClient
 					const devicesCookie = cookiesManager.getDevices();
 
 					if (!devicesCookie || devicesCookie.webcamEnabled)
-						return this.enableWebcam();
+						this.enableWebcam();
 				}
 			})
 			.then(() =>
