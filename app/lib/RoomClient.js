@@ -908,6 +908,8 @@ export default class RoomClient
 
 	_handleConsumer(consumer)
 	{
+		const codec = consumer.rtpParameters.codecs[0];
+
 		this._dispatch(stateActions.addConsumer(
 			{
 				id             : consumer.id,
@@ -917,7 +919,7 @@ export default class RoomClient
 				locallyPaused  : consumer.locallyPaused,
 				remotelyPaused : consumer.remotelyPaused,
 				track          : null,
-				codec          : consumer.rtpParameters.codecs[0].name
+				codec          : codec ? codec.name : null
 			},
 			consumer.peer.name));
 

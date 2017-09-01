@@ -59,7 +59,7 @@ export const Consumer = PropTypes.shape(
 		locallyPaused  : PropTypes.bool.isRequired,
 		remotelyPaused : PropTypes.bool.isRequired,
 		track          : PropTypes.any,
-		codec          : PropTypes.string.isRequired
+		codec          : PropTypes.string
 	});
 
 export const Notification = PropTypes.shape(
