@@ -58,13 +58,16 @@ let httpsServer = https.createServer(tls, (req, res) =>
 		res.end();
 	});
 
-httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
-{
-	logger.log('protoo WebSocket server running');
-});
+//httpsServer.listen(config.protoo.listenPort, config.protoo.listenIp, () =>
+//{
+//	logger.log('protoo WebSocket server running');
+//});
 
 // Protoo WebSocket server.
-let webSocketServer = new protooServer.WebSocketServer(httpsServer,
+const http = require('http')
+var httpServer = http.createServer();
+httpServer.listen(config.protoo.listenPort, config.protoo.listenIp);
+let webSocketServer = new protooServer.WebSocketServer(httpServer,
 	{
 		maxReceivedFrameSize     : 960000, // 960 KBytes.
 		maxReceivedMessageSize   : 960000,

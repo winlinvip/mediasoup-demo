@@ -6,7 +6,7 @@ export function getProtooUrl(peerId, roomId)
 {
 	let hostname = window.location.hostname;
 	let port = config.protoo.listenPort;
-	let url = `wss://${hostname}:${port}/?peer-id=${peerId}&room-id=${roomId}`;
+	let url = `ws://${hostname}:${port}/?peer-id=${peerId}&room-id=${roomId}`;
 
 	return url;
 }
